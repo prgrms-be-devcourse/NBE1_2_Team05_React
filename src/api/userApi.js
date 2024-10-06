@@ -54,7 +54,6 @@ export const checkName = async (name) => {
                 return { registerCheck: true };
             }
         } catch (error) {
-            // HTTP Status가 4xx 또는 5xx인 경우에도 서버 응답을 사용
             if (error.response) {
                 const errorData = error.response.data;
                 // 서버에서 보낸 code와 message 기반 처리
@@ -66,8 +65,27 @@ export const checkName = async (name) => {
             }
         }
     };
+}
 
+export const socialUserRegister = async (name) => {
+    try{
+        const response = await axios.post(`${API_BASE_URL}/oauth/register`, {
+            name
+        },{
+            withCredentials: true  // 세션 쿠키를 포함하도록 설정
+        });
 
-
-
+        if(response.data.isSuccess){
+            return {registerCheck: true};
+        }
+    }catch(error){
+        if(error.response){
+            const errorData = error.response.data;
+            if(errorData.code !== "COMMON200"){
+                return {registerCheck:false, message: errorData.message};
+            }else{
+                return {registerCheck:false, message: "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."};
+            }
+        }
+    }
 }

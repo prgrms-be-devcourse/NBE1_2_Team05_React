@@ -19,6 +19,7 @@ const NaverLoginButton = ({buttonText = "네이버 로그인"}) => {
 
     return (
         <button
+            type="button"
             onClick={handleNaverLogin}
             style={{
                 display: 'flex',

@@ -1,8 +1,11 @@
 import React from 'react';
-import KakaoIcon from '../../assets/image/kakao-svgrepo-com.svg'; // 로컬 SVG 파일을 임포트
+import KakaoIcon from '../../assets/image/kakao-svgrepo-com.svg';
+import {useNavigate} from 'react-router-dom';
+
 
 const KakaoLoginButton = ({buttonText = "카카오 로그인"}) => {
 
+    const navigate = useNavigate();
 
     const clientId = '1233e57ac8c8b3842d362cb6736f2166';
     const redirectUri = 'http://localhost:8080/api/v1/members/oauth/KAKAO';
@@ -19,6 +22,7 @@ const KakaoLoginButton = ({buttonText = "카카오 로그인"}) => {
 
     return (
         <button
+            type="button"
             onClick={handleKakaoLogin}
             style={{
                 display: 'flex',

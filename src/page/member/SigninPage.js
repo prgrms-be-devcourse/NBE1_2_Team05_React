@@ -49,7 +49,8 @@ export default function SignIn() {
     };
 
     const validatePassword = (password) => {
-        return password.length >= 8;
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\d~!@#$%^&*()+|=]{8,16}$/;
+        return passwordRegex.test(password);
     };
 
     const handleSnackbarClose = () => {
@@ -72,7 +73,7 @@ export default function SignIn() {
 
         // 비밀번호 유효성 검사
         if (!validatePassword(password)) {
-            setPasswordError("비밀번호는 최소 8자 이상이어야 합니다.");
+            setPasswordError("비밀번호는 최소8~최대16자 영문자, 숫자, 특수문자 1개씩을 포함해야 합니다.");
             isValid = false;
         }
 
@@ -87,26 +88,7 @@ export default function SignIn() {
         try {
             // 서버에 로그인 요청 보내기
             const loginData = { email, password };
-            // const response = await axios.post('/api/v1/login', loginData);
-
-            // 응답 처리 및 성공 시 리다이렉트
-            // if (response.data.isSuccess) {
-            //     navigate('/dashboard'); // 성공 시 대시보드로 리디렉션
-            // } else {
-            //     setSnackbarSeverity('error');
-            //     setSnackbarMessage("로그인에 실패했습니다.");
-            //     setOpenSnackbar(true);
-            // }
-
-            // 테스트용 성공 메시지
-            // setSnackbarSeverity('success');
-            // setSnackbarMessage("로그인 성공! 리디렉션 중...");
-            // setOpenSnackbar(true);
-            //
-            // // 로그인 성공 시 2초 후 리다이렉트
-            // setTimeout(() => {
-            //     navigate('/dashboard');
-            // }, 2000);
+            // 서버 호출 로직 추가
         } catch (error) {
             setSnackbarSeverity('error');
             setSnackbarMessage("로그인 중 오류가 발생했습니다. 다시 시도해주세요.");
@@ -180,8 +162,9 @@ export default function SignIn() {
                             >
                                 로그인
                             </Button>
-                            <NaverLoginButton />
-                            <KakaoLoginButton />
+                            {/* 네이버와 카카오 로그인 버튼 */}
+                            <NaverLoginButton type="button" buttonText="네이버 로그인" />
+                            <KakaoLoginButton type="button" buttonText="카카오 로그인" />
                         </Box>
                         <Grid container justifyContent="flex-end" sx={{ mt: 2 }}>
                             <Grid item>
