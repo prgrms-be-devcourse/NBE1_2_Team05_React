@@ -1,28 +1,25 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import SomunIcon from '../../assets/image/somun_icon.png';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import { useNavigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-// .image 폴더에 있는 소셜 로그인 아이콘 불러오기
-import KakaoLoginButton from './KakaoLoginButton';
+import SomunIcon from '../../assets/image/somun_icon.png';
 import NaverLoginButton from "./NaverLoginButton";
+import KakaoLoginButton from "./KakaoLoginButton";
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
             {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                Social Culture
-            </Link>{' '}
+            Social Culture
             {new Date().getFullYear()}
             {'.'}
         </Typography>
@@ -31,29 +28,90 @@ function Copyright(props) {
 
 const theme = createTheme();
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 export default function SignIn() {
+    const [email, setEmail] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [password, setPassword] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+
+    const navigate = useNavigate();
+
+    const validateEmailFormat = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const validatePassword = (password) => {
+        return password.length >= 8;
+    };
+
+    const handleSnackbarClose = () => {
+        setOpenSnackbar(false);
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        const loginData = {
-            email: data.get('email'),
-            password: data.get('password'),
-        };
+        let isValid = true;
 
-        // try {
-        //     const isSuccess = loginData.email === 'master@gmail.com' && loginData.password === '1234'; // 임시 성공 조건
-        //
-        //     if (isSuccess) {
-        //         alert('로그인 성공!');
-        //         localStorage.setItem('token', 'temporary_token'); // 임시로 토큰 저장
-        //         window.location.href = '/'; // 메인 페이지로 리디렉션
-        //     } else {
-        //         alert('로그인 실패! 이메일 또는 비밀번호를 확인해주세요.');
-        //     }
-        // } catch (error) {
-        //     console.error('로그인 실패:', error);
-        //     alert('로그인에 실패했습니다. 다시 시도해주세요.');
-        // }
+        // 초기화
+        setEmailError('');
+        setPasswordError('');
+
+        // 이메일 유효성 검사
+        if (!validateEmailFormat(email)) {
+            setEmailError("유효하지 않은 이메일 형식입니다.");
+            isValid = false;
+        }
+
+        // 비밀번호 유효성 검사
+        if (!validatePassword(password)) {
+            setPasswordError("비밀번호는 최소 8자 이상이어야 합니다.");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            setSnackbarSeverity('error');
+            setSnackbarMessage("입력한 정보를 다시 확인해주세요.");
+            setOpenSnackbar(true);
+            return;
+        }
+
+        // 서버로 로그인 요청
+        try {
+            // 서버에 로그인 요청 보내기
+            const loginData = { email, password };
+            // const response = await axios.post('/api/v1/login', loginData);
+
+            // 응답 처리 및 성공 시 리다이렉트
+            // if (response.data.isSuccess) {
+            //     navigate('/dashboard'); // 성공 시 대시보드로 리디렉션
+            // } else {
+            //     setSnackbarSeverity('error');
+            //     setSnackbarMessage("로그인에 실패했습니다.");
+            //     setOpenSnackbar(true);
+            // }
+
+            // 테스트용 성공 메시지
+            // setSnackbarSeverity('success');
+            // setSnackbarMessage("로그인 성공! 리디렉션 중...");
+            // setOpenSnackbar(true);
+            //
+            // // 로그인 성공 시 2초 후 리다이렉트
+            // setTimeout(() => {
+            //     navigate('/dashboard');
+            // }, 2000);
+        } catch (error) {
+            setSnackbarSeverity('error');
+            setSnackbarMessage("로그인 중 오류가 발생했습니다. 다시 시도해주세요.");
+            setOpenSnackbar(true);
+        }
     };
 
     return (
@@ -68,9 +126,14 @@ export default function SignIn() {
                         alignItems: 'center',
                     }}
                 >
-                    <img src={SomunIcon} alt="소문 로고" style={{width: '40%', height: '40%',marginBottom: '10px'}}/>
+                    <img
+                        src={SomunIcon}
+                        alt="소문 로고"
+                        style={{ width: '40%', height: '40%', marginBottom: '10px', cursor: 'pointer' }}
+                        onClick={() => navigate('/signin')}
+                    />
 
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1, width: '100%'}}>
+                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
                         <TextField
                             margin="normal"
                             required
@@ -80,6 +143,10 @@ export default function SignIn() {
                             name="email"
                             autoComplete="email"
                             autoFocus
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            error={!!emailError}
+                            helperText={emailError}
                         />
                         <TextField
                             margin="normal"
@@ -90,6 +157,10 @@ export default function SignIn() {
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            error={!!passwordError}
+                            helperText={passwordError}
                         />
 
                         <Box
@@ -97,7 +168,7 @@ export default function SignIn() {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
-                                gap: 2, // 버튼들 사이의 간격을 동일하게 유지
+                                gap: 2,
                                 width: '100%'
                             }}
                         >
@@ -105,15 +176,14 @@ export default function SignIn() {
                                 type="submit"
                                 fullWidth
                                 variant="contained"
-                                sx={{mt: 3, mb: 0}}
+                                sx={{ mt: 3, mb: 0 }}
                             >
                                 로그인
                             </Button>
-                            <NaverLoginButton/>
-                            <KakaoLoginButton/>
+                            <NaverLoginButton />
+                            <KakaoLoginButton />
                         </Box>
                         <Grid container justifyContent="flex-end" sx={{ mt: 2 }}>
-
                             <Grid item>
                                 <Link href="/signup" variant="body2">
                                     {"계정이 없으신가요? 회원가입"}
@@ -122,7 +192,13 @@ export default function SignIn() {
                         </Grid>
                     </Box>
                 </Box>
-                <Copyright sx={{mt: 8, mb: 4}}/>
+                <Copyright sx={{ mt: 8, mb: 4 }} />
+                {/* Snackbar 컴포넌트 추가 */}
+                <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleSnackbarClose}>
+                    <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
             </Container>
         </ThemeProvider>
     );
