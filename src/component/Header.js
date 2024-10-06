@@ -14,8 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import {useNavigate} from "react-router-dom";
 
-import SiginPage from '../page/member/SignupPage';
-import SigupPage from '../page/member/SignupPage';
+import { useAuth } from "../context/AuthContext";
 
 // 페이지 및 링크 관리 객체
 const PAGE_LINKS = {
@@ -24,9 +23,9 @@ const PAGE_LINKS = {
     CATEGORY_3: {name: '카테고리3', link: '/category3'},
 
     // 로그인
-    LOGIN: { name: '로그인', link: '/login' },
+    SIGNIN: { name: '로그인', link: '/signin' },
     SIGNUP: { name: '회원가입', link: '/signup' },
-    CUSTOMER_SUPPORT: { name: '고객센터', link: '/customer-support' },
+    SUPPORT: { name: '고객센터', link: '/support' },
 
     // 비 로그인
     MY_PAGE: {name: '마이페이지', link: '/mypage'},
@@ -48,22 +47,18 @@ function reducer(state, action) {
             return { ...state, anchorElUser: action.payload };
         case 'CLOSE_USER_MENU':
             return { ...state, anchorElUser: null };
-        case 'RENDER_SIGNIN_PAGE':
-            return { ...state, currentPage: 'signin' };
-        case 'RENDER_SIGNUP_PAGE':
-            return { ...state, currentPage: 'signup' };
         default:
             return state;
     }
 }
 
-function ResponsiveAppBar() {
-    const [auth, setAuth] = React.useState(false);
+function Header() {
+    const { isLoggedIn, logout, loading } = useAuth();
+    const navigate = useNavigate();
 
     const [state, dispatch] = React.useReducer(reducer, {
         anchorElNav: null,
         anchorElUser: null,
-        currentPage: null, // 현재 페이지 상태
     });
 
     const handleOpenNavMenu = (event) => {
@@ -82,14 +77,21 @@ function ResponsiveAppBar() {
         dispatch({ type: 'CLOSE_USER_MENU' });
     };
 
-    const navigate = useNavigate();
-
     const handlePageNavigation = (pageLink) => {
-        alert(`Navigating to: ${pageLink.name}`);  // 페이지 이름을 알림으로 띄움
-        navigate(pageLink.link);  // 페이지 이동
         handleCloseNavMenu();
         handleCloseUserMenu();
+        alert(`Navigating to: ${pageLink.name}`);  // 페이지 이름을 알림으로 띄움
+
+        if (pageLink.name === PAGE_LINKS.LOGOUT.name) { // 현재 누른 버튼이 로그아웃이면,
+            logout(); // 로그아웃 함수 호출
+            navigate('/');
+        } else {
+           navigate(pageLink.link);  // 페이지 이동
+        }
     };
+
+    // 로딩 중일 때는 UI를 표시하지 않음
+    if (loading) return null;
 
     return (
         <AppBar position="static">
@@ -178,32 +180,38 @@ function ResponsiveAppBar() {
                             <Button
                                 key={page.name}
                                 onClick={() => handlePageNavigation(page)}
-                                sx={{ my: 2, color: 'white', display: 'block' }}
+                                /*sx={{ my: 2, color: 'white', display: 'block' }}*/
+                                sx={{
+                                    my: 2,
+                                    color: 'white',
+                                    display: 'block',
+                                    '&:hover': { color: 'red' }, // 마우스 포인터가 들어갈 때 글자 색 변경
+                                }}
                             >
                                 {page.name}
                             </Button>
                         ))}
                     </Box>
 
-                    {!auth && (
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <Button color="inherit" onClick={() => handlePageNavigation(PAGE_LINKS.LOGIN)}>로그인</Button>
-                            <Typography variant="body1" sx={{ mx: 1 }}>|</Typography>
-                            <Button color="inherit" onClick={() => handlePageNavigation(PAGE_LINKS.SIGNUP)}>회원가입</Button>
-                            <Typography variant="body1" sx={{ mx: 1 }}>|</Typography>
-                            <Button color="inherit" onClick={() => handlePageNavigation(PAGE_LINKS.CUSTOMER_SUPPORT)}>고객센터</Button>
+                    {!isLoggedIn ? (
+                        <Box sx={{display: 'flex', alignItems: 'center'}}>
+                            <Button color="inherit" onClick={() => handlePageNavigation(PAGE_LINKS.SIGNIN)}>로그인</Button>
+                            <Typography variant="body1" sx={{mx: 1}}>|</Typography> {/* 구분자 */}
+                            <Button color="inherit"
+                                    onClick={() => handlePageNavigation(PAGE_LINKS.SIGNUP)}>회원가입</Button>
+                            <Typography variant="body1" sx={{mx: 1}}>|</Typography> {/* 구분자 */}
+                            <Button color="inherit"
+                                    onClick={() => handlePageNavigation(PAGE_LINKS.SUPPORT)}>고객센터</Button>
                         </Box>
-                    )}
-
-                    {auth &&
-                        <Box sx={{ flexGrow: 0 }}> {/*로그인 후*/}
+                    ) : (
+                        <Box sx={{flexGrow: 0}}> {/*로그인 후*/}
                             <Tooltip title="Open settings">
-                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                                <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg"/>
                                 </IconButton>
                             </Tooltip>
                             <Menu
-                                sx={{ mt: '45px' }}
+                                sx={{mt: '45px'}}
                                 id="menu-appbar"
                                 anchorEl={state.anchorElUser}
                                 anchorOrigin={{
@@ -220,12 +228,12 @@ function ResponsiveAppBar() {
                             >
                                 {settings.map((setting) => (
                                     <MenuItem key={setting.name} onClick={() => handlePageNavigation(setting)}>
-                                        <Typography sx={{ textAlign: 'center' }}>{setting.name}</Typography>
+                                        <Typography sx={{textAlign: 'center'}}>{setting.name}</Typography>
                                     </MenuItem>
                                 ))}
                             </Menu>
                         </Box>
-                    }
+                    )}
 
                 </Toolbar>
             </Container>
@@ -233,4 +241,4 @@ function ResponsiveAppBar() {
     );
 }
 
-export default ResponsiveAppBar;
+export default Header;
