@@ -13,6 +13,9 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+import {useNavigate} from "react-router-dom";
+import {useAuth} from "../../context/AuthContext"; // useAuth 훅 포인트
+
 // .image 폴더에 있는 소셜 로그인 아이콘 불러오기
 import NaverIcon from '../../assets/image/btn_naver.svg';
 import KakaoIcon from '../../assets/image/btn_kakao.svg';
@@ -33,6 +36,9 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
+    const { login } = useAuth();  // useAuth 훅에서 login 함수 가져오기
+    const navigate = useNavigate();
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -64,7 +70,13 @@ export default function SignIn() {
                 // 로그인 성공 처리
                 alert('로그인 성공!');
                 localStorage.setItem('token', 'temporary_token'); // 임시로 토큰 저장
-                window.location.href = '/'; // 메인 페이지로 리디렉션
+
+                login('temporary_token'); // useAuth 에서 가져온 login 함수 호출
+
+                // 메인 페이지로 리디렉션
+                navigate('/');
+
+                // window.location.href = '/'; // 메인 페이지로 리디렉션
             } else {
                 // 로그인 실패 처리
                 alert('로그인 실패! 이메일 또는 비밀번호를 확인해주세요.');
