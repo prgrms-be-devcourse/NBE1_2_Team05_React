@@ -15,6 +15,9 @@ import AdbIcon from '@mui/icons-material/Adb';
 import {useNavigate} from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
+import {Stack} from "@mui/material";
+
+import somunLogo from '../assets/image/somun.png';
 
 // 페이지 및 링크 관리 객체
 const PAGE_LINKS = {
@@ -25,7 +28,6 @@ const PAGE_LINKS = {
     // 로그인
     SIGNIN: { name: '로그인', link: '/signin' },
     SIGNUP: { name: '회원가입', link: '/signup' },
-    SUPPORT: { name: '고객센터', link: '/support' },
 
     // 비 로그인
     MY_PAGE: {name: '마이페이지', link: '/mypage'},
@@ -53,7 +55,7 @@ function reducer(state, action) {
 }
 
 function Header() {
-    const { isLoggedIn, logout, loading } = useAuth();
+    const { isLoggedIn, userName, logout, loading } = useAuth();
     const navigate = useNavigate();
 
     const [state, dispatch] = React.useReducer(reducer, {
@@ -94,10 +96,14 @@ function Header() {
     if (loading) return null;
 
     return (
-        <AppBar position="static">
+        <AppBar position="static" sx={ {backgroundColor: 'white'} }>
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} /> {/*확장 로고 아이콘*/}
+                    {/*<AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />*/} {/*확장 로고 아이콘*/}
+                    {/*<AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, color: 'black' }} />*/}
+{/*                    <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 2, alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/')}>
+                        <img src={somunLogo} alt="소문 로고" style={{ width: '40px', height: '40px' }} />
+                    </Box>*/}
                     <Typography
                         variant="h5"
                         noWrap
@@ -105,18 +111,19 @@ function Header() {
                         href="/"
                         sx={{
                             mr: 2,
-                            display: { xs: 'none', md: 'flex' },
+                            display: {xs: 'none', md: 'flex'},
                             fontFamily: 'monospace',
                             fontWeight: 700,
                             letterSpacing: '.3rem',
-                            color: 'inherit',
+                            /*color: 'inherit',*/
+                            color: 'black',
                             textDecoration: 'none',
                         }}
                     >
-                        소문
+                        <img src={somunLogo} alt="소문 로고" style={{width: '100px', height: '60px', marginRight: '8px'}}/>
                     </Typography>
 
-                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}> {/*축소 카테고리*/}
+                    <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}> {/*축소 카테고리*/}
                         <IconButton
                             size="large"
                             aria-label="account of current user"
@@ -125,7 +132,7 @@ function Header() {
                             onClick={handleOpenNavMenu}
                             color="inherit"
                         >
-                            <MenuIcon />
+                            <MenuIcon sx={{ color: 'black' }} />
                         </IconButton>
 
                         <Menu
@@ -155,7 +162,7 @@ function Header() {
                         </Menu>
                     </Box>
 
-                    <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} /> {/*축소 로고 아이콘*/}
+                    <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1, color: 'black' }} /> {/*축소 로고 아이콘*/}
                     <Typography
                         variant="h5"
                         noWrap
@@ -168,7 +175,8 @@ function Header() {
                             fontFamily: 'monospace',
                             fontWeight: 700,
                             letterSpacing: '.3rem',
-                            color: 'inherit',
+                            /*color: 'inherit',*/
+                            color: 'black',
                             textDecoration: 'none',
                         }}
                     >
@@ -183,9 +191,13 @@ function Header() {
                                 /*sx={{ my: 2, color: 'white', display: 'block' }}*/
                                 sx={{
                                     my: 2,
-                                    color: 'white',
+                                    /*color: 'white',*/
+                                    color: 'black',
                                     display: 'block',
-                                    '&:hover': { color: 'red' }, // 마우스 포인터가 들어갈 때 글자 색 변경
+                                    '&:hover': {
+                                        color: '#00008B',
+                                        backgroundColor: '#E0E0E0' // 마우스 호버 시 배경을 조금 더 진하게
+                                    }, // 마우스 포인터가 들어갈 때 글자 색 변경
                                 }}
                             >
                                 {page.name}
@@ -194,17 +206,32 @@ function Header() {
                     </Box>
 
                     {!isLoggedIn ? (
-                        <Box sx={{display: 'flex', alignItems: 'center'}}>
-                            <Button color="inherit" onClick={() => handlePageNavigation(PAGE_LINKS.SIGNIN)}>로그인</Button>
-                            <Typography variant="body1" sx={{mx: 1}}>|</Typography> {/* 구분자 */}
-                            <Button color="inherit"
-                                    onClick={() => handlePageNavigation(PAGE_LINKS.SIGNUP)}>회원가입</Button>
-                            <Typography variant="body1" sx={{mx: 1}}>|</Typography> {/* 구분자 */}
-                            <Button color="inherit"
-                                    onClick={() => handlePageNavigation(PAGE_LINKS.SUPPORT)}>고객센터</Button>
-                        </Box>
+                        <Stack spacing={2} direction="row" alignItems="center"> {/* alignItems로 수직 정렬을 맞춤 */}
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Button
+                                    variant="text"
+                                    sx={{color: 'black', '&:hover': { backgroundColor: '#E0E0E0', color: '#00008B' }}}
+                                    onClick={() => handlePageNavigation(PAGE_LINKS.SIGNIN)}
+                                >
+                                    로그인
+                                </Button>
+                                <Typography variant="body1" sx={{ mx: 1, color: 'black', userSelect: 'none' }}>
+                                    |
+                                </Typography>  {/* 구분자 */}
+                                <Button
+                                    variant="text"
+                                    sx={{color: 'black', '&:hover': { backgroundColor: '#E0E0E0', color: '#00008B' }}}
+                                    onClick={() => handlePageNavigation(PAGE_LINKS.SIGNUP)}
+                                >
+                                    회원가입
+                                </Button>
+                            </Box>
+                        </Stack>
                     ) : (
-                        <Box sx={{flexGrow: 0}}> {/*로그인 후*/}
+                        <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center' }}> {/*로그인 후*/}
+                            <Typography sx={{ mr: 2, color: 'black' }}>
+                                {userName} 님 반갑습니다. {/* 사용자 이름을 출력 */}
+                            </Typography>
                             <Tooltip title="Open settings">
                                 <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
                                     <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg"/>
