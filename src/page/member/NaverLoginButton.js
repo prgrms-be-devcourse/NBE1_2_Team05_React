@@ -11,7 +11,7 @@ const NaverLoginButton = ({buttonText = "네이버 로그인"}) => {
 
     const handleNaverLogin = () => {
         // 네이버 OAuth URL로 리디렉션하는 코드
-        const naverOAuthURL = 'https://nid.naver.com/oauth2.0/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}';
+        const naverOAuthURL = `https://nid.naver.com/oauth2.0/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
 
 
         window.location.href = naverOAuthURL; // 네이버 OAuth URL을 입력
