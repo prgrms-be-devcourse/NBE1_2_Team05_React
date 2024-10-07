@@ -6,10 +6,11 @@ import SignupPage from './page/member/SignupPage';
 import PerformanceDetailPage from './page/performance/PerformanceDetailPage';
 import TicketPurchasePage from './page/ticket/TicketPurchasePage';
 import UserProfilePage from './page/member/MemberProfilePage';
-import Header from './component/Header';
 import { useAuth } from './hook/useAuth';
 import NicknamePage from "./page/member/NicknamePage";
 import MemberCategoryPage from "./page/member/MemberCategoryPage";
+import Header from "./component/Header";
+import {AuthProvider} from "./context/AuthContext";
 
 function Layout() {
     const location = useLocation();
@@ -52,7 +53,9 @@ function Layout() {
 function App() {
     return (
         <Router>
-            <Layout />
+            <AuthProvider>
+                <Layout />
+            </AuthProvider>
         </Router>
     );
 }
