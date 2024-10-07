@@ -9,13 +9,14 @@ import UserProfilePage from './page/member/MemberProfilePage';
 import Header from './component/Header';
 import { useAuth } from './hook/useAuth';
 import NicknamePage from "./page/member/NicknamePage";
+import MemberCategoryPage from "./page/member/MemberCategoryPage";
 
 function Layout() {
     const location = useLocation();
     const { isLoggedIn } = useAuth();
 
     // 헤더를 숨기고 싶은 경로들을 배열로 저장
-    const noHeaderRoutes = ['/signin', '/signup', '/nickname'];
+    const noHeaderRoutes = ['/signin', '/signup', '/nickname', '/member/category'];
 
     return (
         <div>
@@ -27,6 +28,7 @@ function Layout() {
                 <Route path="/signin" element={<SigninPage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/nickname" element={<NicknamePage />} />
+                <Route path="/member/category" element={<MemberCategoryPage />} />
 
 
                 {/* 로그인 여부에 따라 페이지 접근 제한 */}

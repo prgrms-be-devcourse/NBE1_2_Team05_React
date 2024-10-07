@@ -112,7 +112,7 @@ export default function SignIn() {
                         src={SomunIcon}
                         alt="소문 로고"
                         style={{ width: '40%', height: '40%', marginBottom: '10px', cursor: 'pointer' }}
-                        onClick={() => navigate('/signin')}
+                        onClick={() => navigate('/singin')}
                     />
 
                     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
