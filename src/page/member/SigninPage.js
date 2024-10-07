@@ -69,9 +69,10 @@ export default function SignIn() {
             if (isSuccess) {
                 // 로그인 성공 처리
                 alert('로그인 성공!');
-                localStorage.setItem('token', 'temporary_token'); // 임시로 토큰 저장
+                // localStorage.setItem('token', 'temporary_token'); // 임시로 토큰 저장
+                // localStorage.setItem('userName', '관리자'); // 임시로 유저 이름 저장
 
-                login('temporary_token'); // useAuth 에서 가져온 login 함수 호출
+                login('token', '관리자'); // useAuth 에서 가져온 login 함수 호출
 
                 // 메인 페이지로 리디렉션
                 navigate('/');
