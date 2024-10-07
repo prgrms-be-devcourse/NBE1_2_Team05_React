@@ -1,32 +1,25 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
+import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import { useNavigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-import {useNavigate} from "react-router-dom";
-import {useAuth} from "../../context/AuthContext"; // useAuth 훅 포인트
-
-// .image 폴더에 있는 소셜 로그인 아이콘 불러오기
-import NaverIcon from '../../assets/image/btn_naver.svg';
-import KakaoIcon from '../../assets/image/btn_kakao.svg';
+import SomunIcon from '../../assets/image/somun_icon.png';
+import NaverLoginButton from "./NaverLoginButton";
+import KakaoLoginButton from "./KakaoLoginButton";
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
             {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                Social Culture
-            </Link>{' '}
+            Social Culture
             {new Date().getFullYear()}
             {'.'}
         </Typography>
@@ -35,73 +28,78 @@ function Copyright(props) {
 
 const theme = createTheme();
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 export default function SignIn() {
-    const { login } = useAuth();  // useAuth 훅에서 login 함수 가져오기
+    const [email, setEmail] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [password, setPassword] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+
     const navigate = useNavigate();
+
+    const validateEmailFormat = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const validatePassword = (password) => {
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\d~!@#$%^&*()+|=]{8,16}$/;
+        return passwordRegex.test(password);
+    };
+
+    const handleSnackbarClose = () => {
+        setOpenSnackbar(false);
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        const loginData = {
-            email: data.get('email'),
-            password: data.get('password'),
-        };
+        let isValid = true;
 
-        // try {
-        //     // 실제 백엔드 로그인 API 호출
-        //     const response = await axios.post('https://your-backend-api.com/api/auth/login', loginData);
-        //     const token = response.data.token;
-        //
-        //     // JWT 토큰을 localStorage에 저장
-        //     localStorage.setItem('token', token);
-        //
-        //     // 로그인 성공 시 원하는 경로로 이동 (예: 메인 페이지)
-        //     window.location.href = '/';
-        // } catch (error) {
-        //     console.error('로그인 실패:', error);
-        //     alert('로그인에 실패했습니다. 다시 시도해주세요.');
-        // }
+        // 초기화
+        setEmailError('');
+        setPasswordError('');
 
-        try {
-            // 임시 로그인 처리
-            const isSuccess = loginData.email === 'master@gmail.com' && loginData.password === '1234'; // 임시 성공 조건
-
-            if (isSuccess) {
-                // 로그인 성공 처리
-                alert('로그인 성공!');
-                // localStorage.setItem('token', 'temporary_token'); // 임시로 토큰 저장
-                // localStorage.setItem('userName', '관리자'); // 임시로 유저 이름 저장
-
-                login('token', '관리자'); // useAuth 에서 가져온 login 함수 호출
-
-                // 메인 페이지로 리디렉션
-                navigate('/');
-
-                // window.location.href = '/'; // 메인 페이지로 리디렉션
-            } else {
-                // 로그인 실패 처리
-                alert('로그인 실패! 이메일 또는 비밀번호를 확인해주세요.');
-            }
-        } catch (error) {
-            console.error('로그인 실패:', error);
-            alert('로그인에 실패했습니다. 다시 시도해주세요.');
+        // 이메일 유효성 검사
+        if (!validateEmailFormat(email)) {
+            setEmailError("유효하지 않은 이메일 형식입니다.");
+            isValid = false;
         }
-    };
 
-    // 네이버 로그인 핸들러
-    const handleNaverLogin = () => {
-        window.location.href = '#'; // 네이버 OAuth URL
-    };
+        // 비밀번호 유효성 검사
+        if (!validatePassword(password)) {
+            setPasswordError("비밀번호는 최소8~최대16자 영문자, 숫자, 특수문자 1개씩을 포함해야 합니다.");
+            isValid = false;
+        }
 
-    // 카카오 로그인 핸들러
-    const handleKakaoLogin = () => {
-        window.location.href = '#'; // 카카오 OAuth URL
+        if (!isValid) {
+            setSnackbarSeverity('error');
+            setSnackbarMessage("입력한 정보를 다시 확인해주세요.");
+            setOpenSnackbar(true);
+            return;
+        }
+
+        // 서버로 로그인 요청
+        try {
+            // 서버에 로그인 요청 보내기
+            const loginData = { email, password };
+            // 서버 호출 로직 추가
+        } catch (error) {
+            setSnackbarSeverity('error');
+            setSnackbarMessage("로그인 중 오류가 발생했습니다. 다시 시도해주세요.");
+            setOpenSnackbar(true);
+        }
     };
 
     return (
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xs">
-                <CssBaseline />
+                <CssBaseline/>
                 <Box
                     sx={{
                         marginTop: 8,
@@ -110,68 +108,65 @@ export default function SignIn() {
                         alignItems: 'center',
                     }}
                 >
-                    <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                        <LockOutlinedIcon />
-                    </Avatar>
-                    <Typography component="h1" variant="h5">
-                        소문
-                    </Typography>
+                    <img
+                        src={SomunIcon}
+                        alt="소문 로고"
+                        style={{ width: '40%', height: '40%', marginBottom: '10px', cursor: 'pointer' }}
+                        onClick={() => navigate('/singin')}
+                    />
 
-                    {/* 소셜 로그인 아이콘 추가 */}
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
-                        <img
-                            src={NaverIcon}
-                            alt="네이버 로그인"
-                            style={{ cursor: 'pointer', marginRight: '10px', width: '40px', height: '40px' }}
-                            onClick={handleNaverLogin}
-                        />
-                        <img
-                            src={KakaoIcon}
-                            alt="카카오 로그인"
-                            style={{ cursor: 'pointer', width: '40px', height: '40px' }}
-                            onClick={handleKakaoLogin}
-                        />
-                    </Box>
-
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
                         <TextField
                             margin="normal"
                             required
                             fullWidth
                             id="email"
-                            label="Email Address"
+                            label="이메일"
                             name="email"
                             autoComplete="email"
                             autoFocus
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            error={!!emailError}
+                            helperText={emailError}
                         />
                         <TextField
                             margin="normal"
                             required
                             fullWidth
                             name="password"
-                            label="Password"
+                            label="비밀번호"
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            error={!!passwordError}
+                            helperText={passwordError}
                         />
-                        <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
-                            label="로그인 상태 유지"
-                        />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: 2,
+                                width: '100%'
+                            }}
                         >
-                            로그인
-                        </Button>
-                        <Grid container>
-                            <Grid item xs>
-                                <Link href="/forgot-password" variant="body2">
-                                    비밀번호를 잊으셨나요?
-                                </Link>
-                            </Grid>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                sx={{ mt: 3, mb: 0 }}
+                            >
+                                로그인
+                            </Button>
+                            {/* 네이버와 카카오 로그인 버튼 */}
+                            <NaverLoginButton type="button" buttonText="네이버 로그인" />
+                            <KakaoLoginButton type="button" buttonText="카카오 로그인" />
+                        </Box>
+                        <Grid container justifyContent="flex-end" sx={{ mt: 2 }}>
                             <Grid item>
                                 <Link href="/signup" variant="body2">
                                     {"계정이 없으신가요? 회원가입"}
@@ -181,6 +176,12 @@ export default function SignIn() {
                     </Box>
                 </Box>
                 <Copyright sx={{ mt: 8, mb: 4 }} />
+                {/* Snackbar 컴포넌트 추가 */}
+                <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleSnackbarClose}>
+                    <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
             </Container>
         </ThemeProvider>
     );

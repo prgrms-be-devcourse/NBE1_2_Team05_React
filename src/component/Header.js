@@ -82,7 +82,7 @@ function Header() {
     const handlePageNavigation = (pageLink) => {
         handleCloseNavMenu();
         handleCloseUserMenu();
-        alert(`Navigating to: ${pageLink.name}`);  // 페이지 이름을 알림으로 띄움
+        // alert(`Navigating to: ${pageLink.name}`);  // 페이지 이름을 알림으로 띄움
 
         if (pageLink.name === PAGE_LINKS.LOGOUT.name) { // 현재 누른 버튼이 로그아웃이면,
             logout(); // 로그아웃 함수 호출
