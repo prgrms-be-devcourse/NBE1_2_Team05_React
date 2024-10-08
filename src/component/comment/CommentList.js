@@ -10,7 +10,7 @@ const CommentList = ({ performanceId }) => {
         const fetchComments = async () => {
             try {
                 const data = await getComments(performanceId, page);
-                setComments(data);
+                setComments(data || []);  // response.data.result 값을 가져오므로 정상적으로 처리됨
             } catch (error) {
                 console.error('Failed to fetch comments:', error);
             }
@@ -18,6 +18,10 @@ const CommentList = ({ performanceId }) => {
 
         fetchComments();
     }, [performanceId, page]);
+
+    if (!comments || comments.length === 0) {
+        return <div>No comments available.</div>;
+    }
 
     return (
         <div>
@@ -30,4 +34,5 @@ const CommentList = ({ performanceId }) => {
 };
 
 export default CommentList;
-//This component will be responsible for rendering a list of comments. ->전체 댓글리스트 조회
+//여러개의 댓글을 리스트형식으로 랜더링하는 역할
+//performanceId에 해당하는 모든 댓글 데이터를 가져와서, 각 댓글을 Comment.js를 사용해 렌더링한다.

@@ -10,7 +10,7 @@ export const getComments = async (performanceId, page = 0, size = 10) => {
                 size,
             },
         });
-        return response.data.data;  // Assuming your response structure contains a 'data' field
+        return response.data.result;  // 여기서 result 필드를 반환하도록 수정
     } catch (error) {
         console.error('Error fetching comments', error);
         throw error;

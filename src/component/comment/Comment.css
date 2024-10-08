@@ -1,52 +1,45 @@
-/* Comment.css */
-
-/* 기본 댓글 컨테이너 */
 .comment-container {
     margin-bottom: 15px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding-left: 10px;
+    border-left: 1px solid #ddd;
 }
 
-/* 댓글 작성자 및 타임스탬프 */
+.comment-content {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .comment-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.comment-details {
+    display: flex;
+    flex-direction: column;
 }
 
 .comment-author {
     font-weight: bold;
-    color: #333;
+    font-size: 14px;
 }
 
-.comment-timestamp {
-    font-size: 0.9em;
-    color: #777;
+.comment-date {
+    font-size: 12px;
+    color: #888;
 }
 
-/* 댓글 내용 */
-.comment-content {
-    font-size: 1em;
-    line-height: 1.5;
-    color: #444;
-}
-
-/* 대댓글 컨테이너 */
-.replies-container {
-    margin-top: 10px;
-    padding-left: 20px;
-    border-left: 2px solid #e0e0e0;
-}
-
-/* 대댓글 기본 스타일 */
-.reply-container {
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 6px;
-    background-color: #ffffff;
-    border: 1px solid #ddd;
+.comment-text {
+    margin-top: 5px;
+    font-size: 14px;
 }

@@ -1,12 +1,15 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import CommentList from '../component/comment/CommentList';
 
 const CommentsPage = () => {
-    const performanceId = 1; // Example performance ID. You can make this dynamic.
+    // URL에서 performanceId를 추출
+    const { performanceId } = useParams();
 
     return (
         <div>
-            <h1>Comments</h1>
+            <h1>Comments for Performance {performanceId}</h1>
+            {/* performanceId를 CommentList에 전달 */}
             <CommentList performanceId={performanceId} />
         </div>
     );
