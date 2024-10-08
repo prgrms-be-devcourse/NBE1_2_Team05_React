@@ -69,7 +69,7 @@ export const fetchDetailData = async (performanceId = null) => {
     }
 };
 
-// 마이페이지 공연 조회 (페이징 포함)
+// 마이페이지 공연 조회
 export const fetchMyPerformances = async (pageNum, size) => {
     try {
         const response = await axios.get(`${API_URL}/performances/admin/my`, {
