@@ -35,6 +35,7 @@ function Layout() {
                 <Route path="/member/profile" element={<MemberProfilePage/>}/>
 
                 {/* 로그인 여부에 따라 페이지 접근 제한 */}
+                <Route path="/performance/:performanceId" element={<PerformanceDetailPage />} />
                 <Route
                     path="/performance/register"
                     element={isLoggedIn ? <PerformanceRegisterPage /> : <Navigate to ="/signin" />}

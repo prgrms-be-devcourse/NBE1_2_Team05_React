@@ -31,6 +31,7 @@ export const fetchData = async (pageNum = 1, category = null, search = '') => {
             }
         });
         return response.data.result.map(item => ({
+            performanceId: item.performanceId,
             memberName: item.memberName,
             imageUrl: item.imageUrl,
             title: item.title,
