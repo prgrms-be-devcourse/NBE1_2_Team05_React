@@ -12,6 +12,7 @@ import MemberCategoryPage from "./page/member/MemberCategoryPage";
 import Header from "./component/Header";
 import {AuthProvider} from "./context/AuthContext";
 import TicketPaymentPage from "./page/ticket/TicketPaymentPage";
+import MemberProfilePage from "./page/member/MemberProfilePage";
 
 function Layout() {
     const location = useLocation();
@@ -31,7 +32,6 @@ function Layout() {
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/nickname" element={<NicknamePage />} />
                 <Route path="/member/category" element={<MemberCategoryPage />} />
-                <Route path="/payment" element={<TicketPaymentPage />} />
 
 
                 {/* 로그인 여부에 따라 페이지 접근 제한 */}
@@ -42,6 +42,10 @@ function Layout() {
                 <Route
                     path="/performance/register"
                     element={isLoggedIn ? <PerformanceRegisterPage /> : <Navigate to ="/signin" />}
+                />
+                <Route
+                    path="/purchase/:ticketId"
+                    element={isLoggedIn ? <TicketPurchasePage /> : <Navigate to="/signin" />}
                 />
                 <Route
                     path="/profile"
