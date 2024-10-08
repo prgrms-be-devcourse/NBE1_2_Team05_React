@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'r
 import HomePage from './page/HomePage';
 import SigninPage from './page/member/SigninPage';
 import SignupPage from './page/member/SignupPage';
-import PerformanceDetailPage from './page/performance/PerformanceDetailPage';
 import PerformanceRegisterPage from './page/performance/PerformanceRegisterPage';
 import UserProfilePage from './page/member/MemberProfilePage';
 import { useAuth } from './hook/useAuth';
@@ -11,8 +10,8 @@ import NicknamePage from "./page/member/NicknamePage";
 import MemberCategoryPage from "./page/member/MemberCategoryPage";
 import Header from "./component/Header";
 import {AuthProvider} from "./context/AuthContext";
-import TicketPaymentPage from "./page/ticket/TicketPaymentPage";
 import MemberProfilePage from "./page/member/MemberProfilePage";
+import TicketPaymentPage from "./page/ticket/TicketPaymentPage";
 
 function Layout() {
     const location = useLocation();
@@ -32,20 +31,13 @@ function Layout() {
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/nickname" element={<NicknamePage />} />
                 <Route path="/member/category" element={<MemberCategoryPage />} />
-
+                <Route path="/payment" element={<TicketPaymentPage/>}/>
+                <Route path="/member/profile" element={<MemberProfilePage/>}/>
 
                 {/* 로그인 여부에 따라 페이지 접근 제한 */}
                 <Route
-                    path="/performance/:id"
-                    element={isLoggedIn ? <PerformanceDetailPage /> : <Navigate to="/signin" />}
-                />
-                <Route
                     path="/performance/register"
                     element={isLoggedIn ? <PerformanceRegisterPage /> : <Navigate to ="/signin" />}
-                />
-                <Route
-                    path="/purchase/:ticketId"
-                    element={isLoggedIn ? <TicketPurchasePage /> : <Navigate to="/signin" />}
                 />
                 <Route
                     path="/profile"
