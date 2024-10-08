@@ -30,3 +30,28 @@ export const createComment = async (performanceId, content, parentId = null) => 
         throw error;
     }
 };
+
+// 댓글 수정 API
+export const updateComment = async (commentId, content) => {
+    try {
+        const response = await axios.patch(`${API_URL}/${commentId}`, {
+            content
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating comment', error);
+        throw error;
+    }
+};
+
+
+// 댓글 삭제 API
+export const deleteComment = async (commentId) => {
+    try {
+        const response = await axios.delete(`${API_URL}/${commentId}`);
+        return response.data;  // 서버 응답: 삭제된 댓글의 performanceId
+    } catch (error) {
+        console.error('Error deleting comment', error);
+        throw error;
+    }
+};

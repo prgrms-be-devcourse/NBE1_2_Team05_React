@@ -7,8 +7,8 @@ const CommentList = ({ performanceId }) => {
     const [comments, setComments] = useState([]);
     const [page, setPage] = useState(0);
 
+    // 댓글 목록을 서버에서 가져오는 함수
     useEffect(() => {
-        // 댓글 목록을 서버에서 가져오는 함수
         const fetchComments = async () => {
             try {
                 const data = await getComments(performanceId, page);
@@ -31,6 +31,13 @@ const CommentList = ({ performanceId }) => {
         }
     };
 
+    // 댓글이 수정되었을 때 리스트를 업데이트하는 함수
+    const handleCommentUpdated = (updatedComment) => {
+        setComments(comments.map(comment =>
+            comment.commentId === updatedComment.commentId ? updatedComment : comment
+        ));
+    };
+
     if (!comments || comments.length === 0) {
         return (
             <div>
@@ -47,7 +54,11 @@ const CommentList = ({ performanceId }) => {
 
             {/* 댓글 리스트 */}
             {comments.map(comment => (
-                <Comment key={comment.commentId} comment={comment} />
+                <Comment
+                    key={comment.commentId}
+                    comment={comment}
+                    onCommentUpdated={handleCommentUpdated}  // 수정된 댓글을 리스트에 반영하는 콜백 전달
+                />
             ))}
 
             {/* 다음 페이지 버튼 */}
@@ -57,6 +68,7 @@ const CommentList = ({ performanceId }) => {
 };
 
 export default CommentList;
+
 
 
 //여러개의 댓글을 리스트형식으로 랜더링하는 역할
