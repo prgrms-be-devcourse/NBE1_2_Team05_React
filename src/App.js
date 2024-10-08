@@ -9,6 +9,10 @@ import UserProfilePage from './page/member/MemberProfilePage';
 import { useAuth } from './hook/useAuth';
 import Header from "./component/Header";
 import {AuthProvider} from "./context/AuthContext";
+import CommentTestPage from "./page/CommentTestPage";
+import { useParams } from 'react-router-dom';
+
+
 
 function Layout() {
     const location = useLocation();
@@ -40,10 +44,17 @@ function Layout() {
                     path="/profile"
                     element={isLoggedIn ? <UserProfilePage /> : <Navigate to="/signin" />}
                 />
+                {/* 댓글 테스트 페이지 추가 */}
+                <Route path="/comments/:performanceId" element={<CommentTestPageWrapper />} />
             </Routes>
         </div>
     );
 }
+
+const CommentTestPageWrapper = () => {
+    const { performanceId } = useParams();
+    return <CommentTestPage performanceId={performanceId} />;
+};
 
 function App() {
     return (
