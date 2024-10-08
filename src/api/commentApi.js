@@ -16,3 +16,17 @@ export const getComments = async (performanceId, page = 0, size = 10) => {
         throw error;
     }
 };
+
+// 댓글 생성 API
+export const createComment = async (performanceId, content, parentId = null) => {
+    try {
+        const response = await axios.post(`${API_URL}/${performanceId}`, {
+            content,
+            parentId,
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error creating comment', error);
+        throw error;
+    }
+};
