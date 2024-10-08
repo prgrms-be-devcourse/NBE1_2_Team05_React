@@ -68,3 +68,21 @@ export const fetchDetailData = async (performanceId = null) => {
         throw new Error(err.message);
     }
 };
+
+// 마이페이지 공연 조회 (페이징 포함)
+export const fetchMyPerformances = async (pageNum, size) => {
+    try {
+        const response = await axios.get(`${API_URL}/performances/admin/my`, {
+            params: {
+                page: pageNum - 1, // API에서 0-based index 사용
+                size: size
+            },
+        });
+        return {
+            data: response.data.result || [],
+            totalCount: response.data.totalCount || 0,
+        };
+    } catch (err) {
+        throw new Error(err.message);
+    }
+};
