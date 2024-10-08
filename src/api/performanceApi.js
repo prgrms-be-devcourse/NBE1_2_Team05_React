@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from './axiosInterceptor';
 
 const API_URL = 'http://localhost:8080/api/v1'; // 기본 API URL
 const itemsPerPage = 16; // 페이지당 아이템 수
