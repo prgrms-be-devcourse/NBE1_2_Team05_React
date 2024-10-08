@@ -87,3 +87,18 @@ export const fetchMyPerformances = async (pageNum) => {
         throw new Error(err.message);
     }
 };
+
+// 공연 데이터 추가
+export const registerPerformanceData = async (formData) => {
+    try {
+        const response = await axios.post(`${API_URL}/performances`, formData, {
+            headers: {
+                'Content-Type' : 'application/json',
+            }
+        });
+        return response.data;
+    } catch (err) {
+        console.error('Error registering performance data:', err);
+        throw new Error(err.message);
+    }
+};

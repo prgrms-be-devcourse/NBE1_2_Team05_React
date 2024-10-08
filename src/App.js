@@ -4,6 +4,7 @@ import HomePage from './page/HomePage';
 import SigninPage from './page/member/SigninPage';
 import SignupPage from './page/member/SignupPage';
 import PerformanceDetailPage from './page/performance/PerformanceDetailPage';
+import PerformanceRegisterPage from './page/performance/PerformanceRegisterPage';
 import TicketPurchasePage from './page/ticket/TicketPurchasePage';
 import UserProfilePage from './page/member/MemberProfilePage';
 import { useAuth } from './hook/useAuth';
@@ -38,6 +39,10 @@ function Layout() {
                 <Route
                     path="/performance/:id"
                     element={isLoggedIn ? <PerformanceDetailPage /> : <Navigate to="/signin" />}
+                />
+                <Route
+                    path="/performance/register"
+                    element={isLoggedIn ? <PerformanceRegisterPage /> : <Navigate to ="/signin" />}
                 />
                 <Route
                     path="/purchase/:ticketId"

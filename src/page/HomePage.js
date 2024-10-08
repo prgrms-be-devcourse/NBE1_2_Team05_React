@@ -122,7 +122,7 @@ const HomePage = () => {
                         ))}
                     </div>
                     <div className='performance-write' style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '100%' }}>
-                        <Link to="/register-performance">
+                        <Link to="/performance/register">
                             <Button variant="contained" color="secondary">
                                 공연 추가
                             </Button>
