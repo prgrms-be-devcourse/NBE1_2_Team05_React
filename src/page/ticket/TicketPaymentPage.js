@@ -50,14 +50,8 @@ function PeopleCounter({ numPeople, handleDecrease, handleIncrease, handleInputC
 const fetchCoupons = async () => {
     try {
         const couponData = await getAllCouponsByMemberEmail();
-        return couponData.data;  // 쿠폰 데이터를 반환
-
-        // const exampleCoupons = [
-        //     { couponId: 1, name: '10% 할인 쿠폰', percent: 10 },
-        //     { couponId: 2, name: '20% 할인 쿠폰', percent: 20 }
-        // ];
-        //
-        // return exampleCoupons;
+        console.log(couponData)
+        return couponData;  // 쿠폰 데이터를 반환
     } catch (error) {
         console.error('Failed to fetch coupons:', error);
         throw error;  // 에러를 호출한 쪽에서 처리하도록 던짐
@@ -65,7 +59,7 @@ const fetchCoupons = async () => {
 };
 
 // 쿠폰 선택 컴포넌트
-function CouponSelector({ selectedCoupon, setSelectedCoupon }) {
+function CouponSelector({ selectedCoupon, setSelectedCoupon, setSelectedCouponPercent }) {
     const [coupons, setCoupons] = useState([]);
 
     // 쿠폰 데이터를 가져오는 useEffect
@@ -73,29 +67,35 @@ function CouponSelector({ selectedCoupon, setSelectedCoupon }) {
         const loadCoupons = async () => {
             try {
                 const couponData = await fetchCoupons();
+                const noCouponOption = { couponId: -1, name: '선택 안함', percent: 0 };
+
                 if (couponData.length === 0) {
-                    // 쿠폰 데이터가 없을 때 '쿠폰 없음'을 기본으로 추가
-                    const defaultCoupon = { couponId: -1, name: '쿠폰 없음', percent: 0 };
-                    setCoupons([defaultCoupon]);
-                    setSelectedCoupon(defaultCoupon.couponId); // 기본적으로 '쿠폰 없음' 선택
+                    setCoupons([noCouponOption]);  // 쿠폰이 없을 때 '선택 안함'만 표시
+                    setSelectedCoupon(noCouponOption.couponId);
+                    setSelectedCouponPercent(0);
                 } else {
-                    setCoupons(couponData);
-                    setSelectedCoupon(couponData[0].couponId); // 첫 번째 쿠폰을 기본 선택
+                    setCoupons([noCouponOption, ...couponData]);  // '선택 안함' + 쿠폰 리스트
+                    setSelectedCoupon(noCouponOption.couponId);  // 기본적으로 '선택 안함' 선택
+                    setSelectedCouponPercent(0);
                 }
             } catch (error) {
                 console.error('Failed to fetch coupons:', error);
                 const defaultCoupon = { couponId: -1, name: '쿠폰 없음', percent: 0 };
                 setCoupons([defaultCoupon]);
                 setSelectedCoupon(defaultCoupon.couponId); // 에러 시 '쿠폰 없음' 선택
+                setSelectedCouponPercent(0); // 에러 시 할인율 0으로 설정
             }
         };
 
         loadCoupons();
-    }, [setSelectedCoupon]);
+    }, [setSelectedCoupon, setSelectedCouponPercent]);
 
     // 쿠폰 선택 변경 핸들러
     const handleCouponChange = (event) => {
-        setSelectedCoupon(event.target.value);
+        const selectedCouponId = event.target.value;
+        const coupon = coupons.find(coupon => coupon.couponId === selectedCouponId);
+        setSelectedCoupon(selectedCouponId);
+        setSelectedCouponPercent(coupon.percent); // 선택된 쿠폰의 percent 값 설정
     };
 
     return (
@@ -118,7 +118,6 @@ function CouponSelector({ selectedCoupon, setSelectedCoupon }) {
     );
 }
 
-
 // 결제 정보 컴포넌트
 function PaymentInfo({ numPeople, performancePrice }) {
     return (
@@ -137,6 +136,7 @@ export default function TicketPaymentPage({
                                           }) {
     const [numPeople, setNumPeople] = useState(1); // 기본 인원 수 1명
     const [selectedCoupon, setSelectedCoupon] = useState(''); // 선택된 쿠폰 상태
+    const [selectedCouponPercent, setSelectedCouponPercent] = useState(0); // 선택된 쿠폰의 percent (할인율)
 
     // 인원 수 증가 함수
     const handleIncrease = () => {
@@ -156,6 +156,13 @@ export default function TicketPaymentPage({
         if (!isNaN(value) && value > 0) {
             setNumPeople(value);
         }
+    };
+
+    // 총 결제 금액 계산 (할인 적용)
+    const calculateTotalPrice = () => {
+        const totalPrice = numPeople * performancePrice;
+        const discount = (totalPrice * selectedCouponPercent) / 100;
+        return totalPrice - discount;  // 할인된 총 금액 반환
     };
 
     return (
@@ -180,11 +187,15 @@ export default function TicketPaymentPage({
                         />
 
                         {/* 쿠폰 선택 컴포넌트 */}
-                        <CouponSelector selectedCoupon={selectedCoupon} setSelectedCoupon={setSelectedCoupon} />
+                        <CouponSelector
+                            selectedCoupon={selectedCoupon}
+                            setSelectedCoupon={setSelectedCoupon}
+                            setSelectedCouponPercent={setSelectedCouponPercent}
+                        />
 
-                        {/* 총 결제 금액 = 공연 금액 * 인원 수 계산 */}
+                        {/* 총 결제 금액 = 공연 금액 * 인원 수 - 할인 적용 계산 */}
                         <Typography variant="h6" gutterBottom>
-                            총 결제 금액: {numPeople * performancePrice}원
+                            총 결제 금액: {calculateTotalPrice()}원
                         </Typography>
                     </Grid>
 
