@@ -6,6 +6,7 @@ import { Pagination, TextField, Button } from '@mui/material';
 import { Box } from '@mui/system';
 import axios from 'axios';
 import './HomePage.css';
+import { Link } from 'react-router-dom'; // Link 임포트
 
 const HomePage = () => {
     const [page, setPage] = useState(1);
@@ -144,9 +145,11 @@ const HomePage = () => {
                         ))}
                     </div>
                     <div className='performance-write' style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '90%' }}>
-                        <Button variant="contained" color="secondary">
-                            공연 추가
-                        </Button>
+                        <Link to="/register-performance">
+                            <Button variant="contained" color="secondary">
+                                공연 추가
+                            </Button>
+                        </Link>
                     </div>
                 </div>
 
