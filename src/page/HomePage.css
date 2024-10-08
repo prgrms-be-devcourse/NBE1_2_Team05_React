@@ -1,0 +1,13 @@
+.performance-list {
+    display: flex; /* Flexbox 사용 */
+    flex-wrap: wrap; /* 줄 바꿈 허용 */
+    /* justify-content: flex-start; 카드 간격을 균등하게 배치 */
+    justify-content:flex-start;
+    margin: auto;
+    margin-bottom: 50px; /* 아래쪽 여백 설정 */
+}
+
+.performance-card {
+    flex: 0 1 calc(20%); /* 카드 너비를 20%로 설정하고 여백을 고려 */
+    
+}
