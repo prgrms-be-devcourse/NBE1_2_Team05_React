@@ -34,10 +34,11 @@ function Layout() {
 
 
                 {/* 로그인 여부에 따라 페이지 접근 제한 */}
-                <Route
+                {/* <Route
                     path="/performance/:id"
                     element={isLoggedIn ? <PerformanceDetailPage /> : <Navigate to="/signin" />}
-                />
+                /> */}
+                <Route path="/performance/:performanceId" element={<PerformanceDetailPage />} />
                 <Route
                     path="/performance/register"
                     element={isLoggedIn ? <PerformanceRegisterPage /> : <Navigate to ="/signin" />}
