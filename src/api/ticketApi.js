@@ -21,3 +21,17 @@ export const fetchTickets = async (pageNum) => {
         throw new Error(error.message);
     }
 };
+
+//마이페이지 티켓 삭제
+// 마이페이지 티켓 삭제
+export const deleteTicket = async (ticketId) => {
+    try {
+        const response = await axios.delete(`${API_URL}`, {
+            data: { ticketId }, // DELETE 요청 본문에 ticketId 포함
+        });
+        return response.data; // 삭제된 결과 반환
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+

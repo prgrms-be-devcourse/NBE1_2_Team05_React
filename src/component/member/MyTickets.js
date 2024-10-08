@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Typography from "@mui/material/Typography";
-import { fetchTickets } from '../../api/ticketApi'; // API 호출 분리된 파일 import
+import {deleteTicket, fetchTickets} from '../../api/ticketApi'; // API 호출 분리된 파일 import
 
 const MyTickets = () => {
     const [tickets, setTickets] = useState([]);
@@ -40,6 +40,21 @@ const MyTickets = () => {
         return <p>로딩 중...</p>;
     }
 
+    const handleDelete = async (ticketId) => {
+        try {
+            await deleteTicket(ticketId); // deleteTicket 호출
+            alert('티켓이 성공적으로 삭제되었습니다.');
+            // 삭제 후 티켓 목록 새로 고침
+            const updatedData = await fetchTickets(page);
+            if (updatedData.data.isSuccess) {
+                setTickets(updatedData.data.result);
+                // setTotalPages(Math.ceil(updatedData.totalCount / 6)); // 총 페이지 수 계산
+            }
+        } catch (error) {
+            alert('티켓 삭제 중 오류 발생: ' + error.message);
+        }
+    };
+
     return (
         <>
             <ul>
@@ -65,8 +80,8 @@ const MyTickets = () => {
                                 <strong>종료 시간:</strong> {ticket.dateEndTime ? new Date(ticket.dateEndTime).toLocaleString() : '정보 없음'}
                             </div>
                             <Stack direction="row" spacing={2}>
-                                <Button>티켓 취소</Button>
-                                <Button onClick={() => navigate(`/performances/${ticket.performanceId}`)}>공연 자세히 보기</Button>
+                                <Button onClick={() => handleDelete(ticket.ticketId)}>티켓 취소</Button> {/* onClick에 handleDelete 연결 */}
+                                <Button onClick={() => navigate(`/performances/${ticket.performanceId}`)}>공연 자세히 보기</Button> {/* 공연 상세 페이지로 이동 */}
                             </Stack>
                             <hr />
                         </div>
