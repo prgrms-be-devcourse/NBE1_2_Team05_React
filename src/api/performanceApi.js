@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from './axiosInterceptor';
 
 const API_URL = 'http://localhost:8080/api/v1'; // 기본 API URL
 const itemsPerPage = 16; // 페이지당 아이템 수
@@ -65,6 +65,21 @@ export const fetchDetailData = async (performanceId = null) => {
             categories: item.categories,
         };
     } catch (err) {
+        throw new Error(err.message);
+    }
+};
+
+// 공연 데이터 추가
+export const registerPerformanceData = async (formData) => {
+    try {
+        const response = await axios.post(`${API_URL}/performances`, formData, {
+            headers: {
+                'Content-Type' : 'application/json',
+            }
+        });
+        return response.data;
+    } catch (err) {
+        console.error('Error registering performance data:', err);
         throw new Error(err.message);
     }
 };
