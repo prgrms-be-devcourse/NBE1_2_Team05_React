@@ -1,16 +1,15 @@
 // 홈페이지 메인 화면
-import { useEffect } from 'react';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import PerformanceCard from '../component/performance/PerformanceCard';
 import { Pagination, TextField, Button } from '@mui/material';
 import { Box } from '@mui/system';
-import axios from 'axios';
+import { fetchCategories, fetchData } from '../api/performanceApi'; // API 함수 임포트
 import './HomePage.css';
 import { Link } from 'react-router-dom'; // Link 임포트
 
 const HomePage = () => {
     const [page, setPage] = useState(1);
-    const itemsPerPage = 21; // 페이지당 아이템 수
+    const itemsPerPage = 16; // 페이지당 아이템 수
     const totalItems = 100; // 총 아이템 수 (예시로 100개)
 
     const [data, setData] = useState([]); // 데이터를 저장할 상태
@@ -21,56 +20,34 @@ const HomePage = () => {
     const [categories, setCategories] = useState([]); // 카테고리 리스트 상태
 
     // 카테고리 데이터 조회
-    const fetchCategories = async () => {
+    const loadCategories = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/v1/members/categories'); // 카테고리 API 호출
-            const extractedData = response.data.result.map(item => ({
-                categoryId: item.categoryId,
-                nameKr: item.nameKr,
-                nameEn: item.nameEn,
-            }));
-            console.log(extractedData);
-            setCategories([{ categoryId: null, nameKr: '전체' }, ...extractedData]); // 카테고리 리스트 상태에 저장
-
+            const categoriesData = await fetchCategories();
+            console.log(categoriesData)
+            setCategories([{ categoryId: null, nameKr: '전체' }, ...categoriesData]);
         } catch (err) {
-            setError(err.message); // 에러 메시지 저장
+            setError(err.message);
         }
     };
 
     // 전체 데이터 조회
-    const fetchData = async (pageNum = 1, category = null, search = '') => {
+    const loadData = async () => {
         setLoading(true);
-        console.log(search);
-        console.log(category);
         try {
-            const response = await axios.get('http://localhost:8080/api/v1/performances', {
-                params: {
-                    size: itemsPerPage,
-                    page: pageNum - 1,
-                    category: category,
-                    search: search, // 검색어 추가
-                }
-            });
-            const extractedData = response.data.result.map(item => ({
-                memberName: item.memberName,
-                imageUrl: item.imageUrl,
-                title: item.title,
-                startDate: item.dateStartTime,
-                endDate: item.dateEndTime
-            }));
-            console.log(extractedData);
-            setData(extractedData); // 데이터를 상태에 저장
+            const performances = await fetchData(page, selectedCategory, searchTerm);
+            console.log(performances);
+            setData(performances);
         } catch (err) {
-            setError(err.message); // 에러 메시지 저장
+            setError(err.message);
         } finally {
-            setLoading(false); // 로딩 완료
+            setLoading(false);
         }
     };
 
     // 컴포넌트가 마운트될 때 전체 데이터 조회
     useEffect(() => {
-        fetchCategories(); // 카테고리 데이터 가져오기
-        fetchData(page); // 초기 데이터 가져오기
+        loadCategories(); // 카테고리 데이터 가져오기
+        loadData(page); // 초기 데이터 가져오기
     }, [page]); // 페이지가 변경될 때마다 호출
 
     // 로딩 상태 처리
@@ -126,7 +103,7 @@ const HomePage = () => {
                     onChange={handleSearchChange}
                     onKeyDown={handleKeyPress} // 엔터 키 이벤트 처리
                     fullWidth
-                    style={{ marginBottom: '10px', width: '90%' }} // 입력 필드 아래 여백
+                    style={{ marginBottom: '10px', width: '100%' }} // 입력 필드 아래 여백
                 />
 
                 <div className="category-performance-write">
@@ -144,7 +121,7 @@ const HomePage = () => {
                             </Button>
                         ))}
                     </div>
-                    <div className='performance-write' style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '90%' }}>
+                    <div className='performance-write' style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '100%' }}>
                         <Link to="/register-performance">
                             <Button variant="contained" color="secondary">
                                 공연 추가
