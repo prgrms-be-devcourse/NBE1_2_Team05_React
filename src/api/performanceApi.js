@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:8080/api/v1'; // 기본 API URL
 const itemsPerPage = 16; // 페이지당 아이템 수
+const performancesPerPage = 6; //페이지당 공연 수
 const totalItems = 100; // 총 아이템 수 (예시로 100개)
 
 // 카테고리 데이터 조회
@@ -70,12 +71,12 @@ export const fetchDetailData = async (performanceId = null) => {
 };
 
 // 마이페이지 공연 조회
-export const fetchMyPerformances = async (pageNum, size) => {
+export const fetchMyPerformances = async (pageNum) => {
     try {
         const response = await axios.get(`${API_URL}/performances/admin/my`, {
             params: {
-                page: pageNum - 1, // API에서 0-based index 사용
-                size: size
+                page: pageNum - 1,
+                size: performancesPerPage
             },
         });
         return {

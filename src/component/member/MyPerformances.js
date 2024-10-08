@@ -20,14 +20,13 @@ const MyPerformances = () => {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(10);
-    const performancesPerPage = 6;
     const navigate = useNavigate();
 
     useEffect(() => {
         const getPerformances = async () => {
             setLoading(true);
             try {
-                const {data} = await fetchMyPerformances(page, performancesPerPage);
+                const {data} = await fetchMyPerformances(page);
                 console.log(data);
                 setPerformances(data);
             } catch (error) {
