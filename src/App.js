@@ -49,8 +49,8 @@ function Layout() {
                     element={isLoggedIn ? <TicketPurchasePage /> : <Navigate to="/signin" />}
                 />
                 <Route
-                    path="/profile"
-                    element={isLoggedIn ? <UserProfilePage /> : <Navigate to="/signin" />}
+                    path="/mypage"
+                    element={isLoggedIn ? <MemberProfilePage /> : <Navigate to="/signin" />}
                 />
             </Routes>
         </div>
