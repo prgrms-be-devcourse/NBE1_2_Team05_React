@@ -162,7 +162,6 @@ function Header() {
                         </Menu>
                     </Box>
 
-                    <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1, color: 'black' }} /> {/*축소 로고 아이콘*/}
                     <Typography
                         variant="h5"
                         noWrap
@@ -170,7 +169,7 @@ function Header() {
                         href="/"
                         sx={{
                             mr: 2,
-                            display: { xs: 'flex', md: 'none' },
+                            display: {xs: 'flex', md: 'none'},
                             flexGrow: 1,
                             fontFamily: 'monospace',
                             fontWeight: 700,
@@ -180,10 +179,10 @@ function Header() {
                             textDecoration: 'none',
                         }}
                     >
-                        소문
+                        <img src={somunLogo} alt="소문 로고" style={{width: '100px', height: '60px', marginRight: '8px'}}/>
                     </Typography>
 
-                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}> {/* 확장 카테고리*/}
+                    <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}> {/* 확장 카테고리*/}
                         {pages.map((page) => (
                             <Button
                                 key={page.name}
