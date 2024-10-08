@@ -11,6 +11,7 @@ import NicknamePage from "./page/member/NicknamePage";
 import MemberCategoryPage from "./page/member/MemberCategoryPage";
 import Header from "./component/Header";
 import {AuthProvider} from "./context/AuthContext";
+import MemberProfilePage from "./page/member/MemberProfilePage";
 
 function Layout() {
     const location = useLocation();
@@ -30,6 +31,7 @@ function Layout() {
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/nickname" element={<NicknamePage />} />
                 <Route path="/member/category" element={<MemberCategoryPage />} />
+                <Route path="/mypage" element={<MemberProfilePage />} />
 
 
                 {/* 로그인 여부에 따라 페이지 접근 제한 */}
