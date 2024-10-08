@@ -20,7 +20,7 @@ axios.interceptors.request.use(
     (config) => {
         // Authorization 헤더에 하드코딩된 액세스 토큰 추가
         config.headers = config.headers || {};
-        config.headers.Authorization = `Bearer `;
+        config.headers.Authorization = `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0MTFAZ21haWwuY29tIiwiYXV0aCI6IlJPTEVfUEFETUlOIiwiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZXhwIjoxNzI4MzYwODE5fQ.kZLei6X6q1wkmPRbOb5NNSAmk3uMd31cTBAtDUM29VY`;
         return config;
     },
     (error) => Promise.reject(error)
