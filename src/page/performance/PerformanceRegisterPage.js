@@ -30,6 +30,12 @@ const UploadBox = styled(Paper)(({ theme }) => ({
   },
 }));
 
+// 컴포넌트가 마운트될 때 전체 데이터 조회
+useEffect(() => {
+    loadCategories(); // 카테고리 데이터 가져오기
+    loadData(page); // 초기 데이터 가져오기
+}, [page]); // 페이지가 변경될 때마다 호출
+
 const DatePickerField = ({ label, value, onChange }) => (
     <DatePicker
       label={label}
