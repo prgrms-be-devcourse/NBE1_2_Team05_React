@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'r
 import HomePage from './page/HomePage';
 import SigninPage from './page/member/SigninPage';
 import SignupPage from './page/member/SignupPage';
+import PerformanceRegisterPage from './page/performance/PerformanceRegisterPage';
 import PerformanceDetailPage from './page/performance/PerformanceDetailPage';
-import TicketPurchasePage from './page/ticket/TicketPurchasePage';
 import UserProfilePage from './page/member/MemberProfilePage';
 import { useAuth } from './hook/useAuth';
 import NicknamePage from "./page/member/NicknamePage";
@@ -13,6 +13,8 @@ import Header from "./component/Header";
 import {AuthProvider} from "./context/AuthContext";
 import KakaoCallback from "./page/member/KakaoCallback";
 import NaverCallBack from "./page/member/NaverCallBack";
+import MemberProfilePage from "./page/member/MemberProfilePage";
+import TicketPaymentPage from "./page/ticket/TicketPaymentPage";
 
 function Layout() {
     const location = useLocation();
@@ -32,18 +34,17 @@ function Layout() {
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/nickname" element={<NicknamePage />} />
                 <Route path="/member/category" element={<MemberCategoryPage />} />
+                <Route path="/payment" element={<TicketPaymentPage/>}/>
+                <Route path="/member/profile" element={<MemberProfilePage/>}/>
                 <Route path="/kakao-callback" element={<KakaoCallback />} />
                 <Route path="/naver-callback" element={<NaverCallBack />} />
 
 
                 {/* 로그인 여부에 따라 페이지 접근 제한 */}
+                <Route path="/performance/:performanceId" element={<PerformanceDetailPage />} />
                 <Route
-                    path="/performance/:id"
-                    element={isLoggedIn ? <PerformanceDetailPage /> : <Navigate to="/signin" />}
-                />
-                <Route
-                    path="/purchase/:ticketId"
-                    element={isLoggedIn ? <TicketPurchasePage /> : <Navigate to="/signin" />}
+                    path="/performance/register"
+                    element={isLoggedIn ? <PerformanceRegisterPage /> : <Navigate to ="/signin" />}
                 />
                 <Route
                     path="/profile"
