@@ -11,6 +11,8 @@ import NicknamePage from "./page/member/NicknamePage";
 import MemberCategoryPage from "./page/member/MemberCategoryPage";
 import Header from "./component/Header";
 import {AuthProvider} from "./context/AuthContext";
+import KakaoCallback from "./page/member/KakaoCallback";
+import NaverCallBack from "./page/member/NaverCallBack";
 
 function Layout() {
     const location = useLocation();
@@ -30,6 +32,8 @@ function Layout() {
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/nickname" element={<NicknamePage />} />
                 <Route path="/member/category" element={<MemberCategoryPage />} />
+                <Route path="/kakao-callback" element={<KakaoCallback />} />
+                <Route path="/naver-callback" element={<NaverCallBack />} />
 
 
                 {/* 로그인 여부에 따라 페이지 접근 제한 */}

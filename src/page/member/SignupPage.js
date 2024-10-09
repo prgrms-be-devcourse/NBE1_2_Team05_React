@@ -15,6 +15,8 @@ import { validateEmailAndCheckDuplicate, checkName, basicUserRegister } from "..
 import { useNavigate } from "react-router-dom";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import axios from "../../api/axiosInterceptor";
+
 
 function Copyright(props) {
     return (

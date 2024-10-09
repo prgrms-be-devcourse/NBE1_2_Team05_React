@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from "../../api/axiosInterceptor";
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -88,7 +89,26 @@ export default function SignIn() {
         try {
             // 서버에 로그인 요청 보내기
             const loginData = { email, password };
-            // 서버 호출 로직 추가
+            // POST 요청으로 로그인 데이터 전송
+            const response = await axios.post('http://localhost:8080/api/v1/members/authenticate', loginData);
+
+            // 응답 데이터에서 액세스 토큰과 리프레시 토큰을 가져옴
+            const { accessToken, refreshToken } = response.data;
+
+            // 토큰을 localStorage에 저장
+            await localStorage.setItem('access_token', accessToken);
+            await localStorage.setItem('refresh_token', refreshToken);
+
+            // 로그인 성공 메시지 표시
+            setSnackbarSeverity('success');
+            setSnackbarMessage("로그인에 성공했습니다.");
+            setOpenSnackbar(true);
+
+            // 로그인 후 리다이렉트 (예: 홈으로 이동)
+            setTimeout(() => {
+                navigate('/home');
+            }, 1000);
+
         } catch (error) {
             setSnackbarSeverity('error');
             setSnackbarMessage("로그인 중 오류가 발생했습니다. 다시 시도해주세요.");
