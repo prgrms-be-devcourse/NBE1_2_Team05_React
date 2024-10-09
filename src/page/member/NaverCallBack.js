@@ -5,6 +5,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import {useAuth} from "../../context/AuthContext";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -13,6 +14,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const NaverCallback = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const {login} = useAuth();
 
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -47,13 +49,15 @@ const NaverCallback = () => {
                         localStorage.setItem('access_token', accessToken);
                         localStorage.setItem('refresh_token', refreshToken);
 
+                        login(accessToken,refreshToken);
+
                         setSnackbarSeverity('success');
                         setSnackbarMessage('로그인에 성공했습니다.');
                         setOpenSnackbar(true);
 
                         // 홈 화면으로 리디렉트
                         setTimeout(() => {
-                            navigate('/home', { replace: true });
+                            navigate('/', { replace: true });
                         }, 1000);
                     }
 

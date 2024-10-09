@@ -6,7 +6,7 @@ import SignupPage from './page/member/SignupPage';
 import PerformanceRegisterPage from './page/performance/PerformanceRegisterPage';
 import PerformanceDetailPage from './page/performance/PerformanceDetailPage';
 import UserProfilePage from './page/member/MemberProfilePage';
-import { useAuth } from './hook/useAuth';
+import {useAuth} from "./context/AuthContext";
 import NicknamePage from "./page/member/NicknamePage";
 import MemberCategoryPage from "./page/member/MemberCategoryPage";
 import Header from "./component/Header";

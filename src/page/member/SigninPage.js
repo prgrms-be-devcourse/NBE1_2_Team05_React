@@ -15,6 +15,7 @@ import NaverLoginButton from "./NaverLoginButton";
 import KakaoLoginButton from "./KakaoLoginButton";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import {useAuth} from "../../context/AuthContext";
 
 function Copyright(props) {
     return (
@@ -41,6 +42,8 @@ export default function SignIn() {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+    const {login} = useAuth();
+
 
     const navigate = useNavigate();
 
@@ -99,6 +102,9 @@ export default function SignIn() {
             await localStorage.setItem('access_token', accessToken);
             await localStorage.setItem('refresh_token', refreshToken);
 
+            login();
+
+
             // 로그인 성공 메시지 표시
             setSnackbarSeverity('success');
             setSnackbarMessage("로그인에 성공했습니다.");
@@ -106,7 +112,7 @@ export default function SignIn() {
 
             // 로그인 후 리다이렉트 (예: 홈으로 이동)
             setTimeout(() => {
-                navigate('/home');
+                navigate('/');
             }, 1000);
 
         } catch (error) {
