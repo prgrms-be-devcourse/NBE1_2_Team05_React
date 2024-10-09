@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import axios from 'axios';
+import axios from '../../api/axiosInterceptor';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import SomunIcon from '../../assets/image/somun_icon.png';
 import { useNavigate } from 'react-router-dom';
@@ -248,3 +248,5 @@ export default function MemberCategoryPage() {
         </ThemeProvider>
     );
 }
+
+
