@@ -5,10 +5,13 @@ axios.defaults.withCredentials = true;
 
 let isLoggingOut = false;
 
+
 // 요청 인터셉터
 axios.interceptors.request.use(
     (config) => {
-        const accessToken = getLocalStorage('access_token');
+        const accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdW5naHl1bkBuYXZlci5jb20iLCJhdXRoIjoiUk9MRV9VU0VSIiwiZW1haWwiOiJzdW5naHl1bkBuYXZlci5jb20iLCJleHAiOjE3Mjg0NjM3NTh9.uxhR3C8syoFJZD0Wljtf35piBzoxebOKdB-j-jR8tB8"
+        config.headers = config.headers || {};
+        config.headers.Authorization = `Bearer ${accessToken}`;
         if (accessToken) {
             config.headers = config.headers || {};
             config.headers.Authorization = `Bearer ${accessToken}`;
