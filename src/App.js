@@ -4,6 +4,7 @@ import HomePage from './page/HomePage';
 import SigninPage from './page/member/SigninPage';
 import SignupPage from './page/member/SignupPage';
 import PerformanceRegisterPage from './page/performance/PerformanceRegisterPage';
+import PerformanceDetailPage from './page/performance/PerformanceDetailPage';
 import UserProfilePage from './page/member/MemberProfilePage';
 import { useAuth } from './hook/useAuth';
 import NicknamePage from "./page/member/NicknamePage";
