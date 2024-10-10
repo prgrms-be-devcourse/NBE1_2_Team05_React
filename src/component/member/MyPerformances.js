@@ -26,9 +26,10 @@ const MyPerformances = () => {
         const getPerformances = async () => {
             setLoading(true);
             try {
-                const { data, totalCount, performancesPerPage } = await fetchMyPerformances(page);
-                setPerformances(data);
-                setTotalPages(Math.ceil(totalCount / performancesPerPage));
+                const { data, performancesPerPage } = await fetchMyPerformances(page);
+                console.log(data)
+                setPerformances(data.performanceList);
+                setTotalPages(Math.ceil(data.totalElements / performancesPerPage));
             } catch (error) {
                 console.error("공연 목록을 불러오는 중 오류 발생", error);
                 // 필요 시 사용자에게 오류 메시지 표시
@@ -82,7 +83,7 @@ const MyPerformances = () => {
                                 <CardActions>
                                     <Button
                                         size="small"
-                                        onClick={() => navigate(`/performances/${performance.performanceId}`)}
+                                        onClick={() => navigate(`/performance/${performance.performanceId}`)}
                                     >
                                         자세히 보기
                                     </Button>
