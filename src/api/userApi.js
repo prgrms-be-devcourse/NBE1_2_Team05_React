@@ -81,6 +81,8 @@ export const socialUserRegister = async (name) => {
         if (response.data.accessToken && response.data.refreshToken) {
             localStorage.setItem('access_token', response.data.accessToken);
             localStorage.setItem('refresh_token', response.data.refreshToken);
+            localStorage.setItem('user_name', response.data.userName);
+
 
             return { registerCheck: true, message: '회원가입이 성공적으로 완료되었습니다.' };
         } else {
