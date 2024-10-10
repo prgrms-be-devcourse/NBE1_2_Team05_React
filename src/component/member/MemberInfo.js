@@ -33,7 +33,6 @@ const MemberInfo = () => {
         <div>
             {memberInfo && (
                 <>
-                    <p>이메일: {memberInfo.email}</p>
                     <p>이름: {memberInfo.name}</p>
                     <p>권한: {memberInfo.role}</p>
                 </>
