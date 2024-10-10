@@ -16,6 +16,7 @@ const HomePage = () => {
     const [loading, setLoading] = useState(true); // 로딩 상태
     const [error, setError] = useState(null); // 에러 상태
     const [searchTerm, setSearchTerm] = useState(''); // 검색어 상태
+    const [tmpSearchTerm, setTmpSearchTerm] = useState('')
     const [selectedCategory, setSelectedCategory] = useState(null); // 선택된 카테고리 상태
     const [categories, setCategories] = useState([]); // 카테고리 리스트 상태
 
@@ -91,11 +92,12 @@ const HomePage = () => {
     };
 
     const handleSearchChange = (event) => {
-        setSearchTerm(event.target.value);
+        setTmpSearchTerm(event.target.value);
     };
 
     const handleKeyPress = (event) => {
         if (event.key === 'Enter') {
+            setSearchTerm(tmpSearchTerm);
             setPage(1);
         }
     };
@@ -121,7 +123,7 @@ const HomePage = () => {
                 <TextField
                     label="검색어를 입력하세요"
                     variant="outlined"
-                    value={searchTerm}
+                    value={tmpSearchTerm}
                     onChange={handleSearchChange}
                     onKeyDown={handleKeyPress} // 엔터 키 이벤트 처리
                     fullWidth
