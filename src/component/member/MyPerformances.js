@@ -15,7 +15,7 @@ import {ArrowBack as ArrowBackIcon, ArrowForward as ArrowForwardIcon} from '@mui
 import {useNavigate} from 'react-router-dom';
 import {fetchMyPerformances} from '../../api/performanceApi'; // API 모듈에서 함수 임포트
 
-const MyPerformances = () => {
+const MyPerformances = ({memberInfo}) => {
     const [performances, setPerformances] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -26,7 +26,7 @@ const MyPerformances = () => {
         const getPerformances = async () => {
             setLoading(true);
             try {
-                const { data, performancesPerPage } = await fetchMyPerformances(page);
+                const {data, performancesPerPage} = await fetchMyPerformances(page);
                 console.log(data)
                 setPerformances(data.performanceList);
                 setTotalPages(Math.ceil(data.totalElements / performancesPerPage));
@@ -43,6 +43,10 @@ const MyPerformances = () => {
 
     if (loading) {
         return <p>로딩 중...</p>;
+    }
+
+    if (memberInfo.role === "일반 사용자") {
+        return <p>공연 관리자 권한 신청이 필요합니다</p>;
     }
 
     return (
