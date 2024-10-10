@@ -23,7 +23,7 @@ const PAGE_LINKS = {
     SIGNIN: { name: '로그인', link: '/signin' },
     SIGNUP: { name: '회원가입', link: '/signup' },
     LOGOUT: { name: '로그아웃', link: '/' },
-    MY_PAGE: { name: '마이페이지', link: '/mypage' },
+    MY_PAGE: { name: '마이페이지', link: '/member/profile' },
     MY_TICKETS: { name: '나의 티켓', link: '/mytickets' },
     MANAGER_APPLY: { name: '공연관리자 신청', link: '/managerapply' },
 };
