@@ -15,6 +15,8 @@ import { useAuth } from "../context/AuthContext";  // useAuth 사용
 import { Stack } from "@mui/material";
 import somunLogo from '../assets/image/somun.png';
 import {Container} from "@mui/material";
+import PersonIcon from '@mui/icons-material/Person'
+
 
 // 페이지 및 링크 관리 객체
 const PAGE_LINKS = {
@@ -24,7 +26,7 @@ const PAGE_LINKS = {
     SIGNIN: { name: '로그인', link: '/signin' },
     SIGNUP: { name: '회원가입', link: '/signup' },
     LOGOUT: { name: '로그아웃', link: '/' },
-    MY_PAGE: { name: '마이페이지', link: '/mypage' },
+    MY_PAGE: { name: '마이페이지', link: '/member/profile' },
     MY_TICKETS: { name: '나의 티켓', link: '/mytickets' },
     MANAGER_APPLY: { name: '공연관리자 신청', link: '/managerapply' },
 };
@@ -48,7 +50,7 @@ function reducer(state, action) {
 }
 
 function Header() {
-    const { isLoggedIn, logout } = useAuth();  // 로그인 상태 및 로그아웃 함수 사용
+    const { isLoggedIn, logout, userName } = useAuth();  // 로그인 상태 및 로그아웃 함수 사용
     const navigate = useNavigate();
 
     const [state, dispatch] = React.useReducer(reducer, {
@@ -206,11 +208,27 @@ function Header() {
                         </Stack>
                     ) : (
                         <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center' }}>
-                            <Tooltip title="Open settings">
-                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
-                                </IconButton>
-                            </Tooltip>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    backgroundColor: '#f0f0f0',
+                                    borderRadius: '30px',
+                                    padding: '5px 10px',
+                                }}
+                            >
+                                <Typography sx={{ color: 'black', fontSize: '14px', fontWeight: 'bold', mr: '8px' }}>
+                                    {userName}
+                                </Typography>
+
+                                <Tooltip title="Open settings">
+                                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                        <Avatar sx={{ backgroundColor: '#ccc' }}> 
+                                            <PersonIcon />
+                                        </Avatar>
+                                    </IconButton>
+                                </Tooltip>
+                            </Box>
                             <Menu
                                 sx={{ mt: '45px' }}
                                 id="menu-appbar"
