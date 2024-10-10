@@ -167,7 +167,7 @@ export default function SignUp() {
                     <img src={SomunIcon}
                          alt="소문 로고"
                          style={{width: '40%', height: '40%', marginBottom: '10px'}}
-                         onClick={() => navigate('/singin')}
+                         onClick={() => navigate('/')}
                     />
                     <Box component="form" noValidate onSubmit={handleSubmit} sx={{mt: 3}}>
                         <Grid container spacing={2}>
