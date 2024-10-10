@@ -22,7 +22,7 @@ export const getComments = async (performanceId, page = 0, size = 10) => {
 // 댓글 생성 API
 export const createComment = async (performanceId, content, parentId = null) => {
     try {
-        const response = await axios.post(`${API_URL}/${performanceId}`, {
+        const response = await axios.post(`http://localhost:8080/api/v1/comments/${performanceId}`, {
             content,
             parentId,
         });
@@ -32,6 +32,8 @@ export const createComment = async (performanceId, content, parentId = null) => 
         throw error;
     }
 };
+
+
 
 // 댓글 수정 API
 export const updateComment = async (commentId, content) => {

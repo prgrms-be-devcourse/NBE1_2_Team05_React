@@ -67,13 +67,21 @@ const CommentList = ({ performanceId }) => {
             {/* 댓글 생성 폼 */}
             <CommentForm performanceId={performanceId} onCommentCreated={handleCommentCreated} />
 
-            {/* 댓글 리스트 */}
             {comments.map(comment => (
                 <Comment
                     key={comment.commentId}
                     comment={comment}
+                    performanceId={performanceId}
+                    onCommentUpdated={(updatedComment) => {
+                        setComments((prevComments) =>
+                            prevComments.map((c) =>
+                                c.commentId === updatedComment.commentId ? updatedComment : c
+                            )
+                        );
+                    }}
                 />
             ))}
+
 
             {/* 다음 페이지 버튼 */}
             {hasMore && (

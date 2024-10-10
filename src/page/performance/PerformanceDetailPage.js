@@ -1,7 +1,7 @@
 // 공연 상세 정보 페이지
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { fetchDetailData } from '../../api/performanceApi'; // API 요청 함수
+import { useParams, useNavigate } from 'react-router-dom';
+import { fetchDetailData, confirmPerformance } from '../../api/performanceApi'; // API 요청 함수
 import CommentList from '../../component/comment/CommentList'
 import {
   Container,
@@ -22,6 +22,7 @@ import {
 
 export default function PerformanceDetailPage() {
   const { performanceId } = useParams(); // URL에서 performanceId 가져오기
+  const navigate = useNavigate(); // useNavigate 훅 사용
   const [performanceData, setPerformanceData] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedAttendees, setSelectedAttendees] = useState(0);
@@ -29,6 +30,10 @@ export default function PerformanceDetailPage() {
   const [error, setError] = useState(null);
   const [openDialog, setOpenDialog] = useState(false); // Dialog 상태 관리
   const [selectedImage, setSelectedImage] = useState('');
+
+  const [formData, setFormData] = useState({
+    status: ''
+  });
 
   useEffect(() => {
     const getPerformanceDetails = async () => {
@@ -51,10 +56,6 @@ export default function PerformanceDetailPage() {
   if (error) return <div>Error: {error}</div>;
   if (!performanceData) return <div>No data available</div>;
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -73,15 +74,53 @@ export default function PerformanceDetailPage() {
     setOpenDialog(false); // Dialog 닫기
   };
 
+  // 공연 확정짓기 핸들러
+  const handleConfirmPerformance = async () => {
+    try {
+      // formData 업데이트
+      const updatedData = {
+        status: 'CONFIRMED', // 상태를 CONFIRMED로 변경
+      };
+      
+      await confirmPerformance(performanceId, updatedData); // API 호출
+      // 공연 상세 정보 다시 조회
+      const data = await fetchDetailData(performanceId);
+      setPerformanceData(data); // 상태 업데이트
+    } catch (err) {
+      setError(err.message); // 에러 처리
+      console.error('Error confirming performance:', err);
+    }
+  };
+
+// 티켓 구매 핸들러
+const handleTicketPurchase = () => {
+    navigate(`/payment`, {
+        state: {
+            imageUrl: performanceData.imageUrl || "https://via.placeholder.com/300x200", // 이미지 URL
+            title: performanceData.title, // 공연 제목
+            time: `${performanceData.startDateTime} ~ ${performanceData.endDateTime}`, // 공연 시간
+            performancePrice: performanceData.price, // 가격
+            remainingTickets: performanceData.remainingTickets // 남은 티켓 수
+        }
+    });
+};
+
   const open = Boolean(anchorEl);
   const id = open ? 'attendees-popover' : undefined;
 
   return (
     <Container maxWidth="900px">
       <Paper elevation={3} sx={{ p: 3, my: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          {performanceData.title}
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <Typography variant="h5" gutterBottom>
+                {performanceData.title}
+            </Typography>
+            {performanceData.status === 'NOT_CONFIRMED' && performanceData.isUpdatable && (
+                <Button variant="contained" color="primary" onClick={handleConfirmPerformance}>
+                공연 확정짓기
+                </Button>
+            )}
+        </Box>
         <Divider sx={{ my: 2 }} />
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
@@ -139,9 +178,6 @@ export default function PerformanceDetailPage() {
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
           <Typography sx={{marginRight:'100px', marginBottom:'20px', color: 'grey.500'}}>{performanceData.remainingTickets} / {performanceData.maxAudience} </Typography>
           <Box>
-            <Button variant="contained" onClick={handleClick} sx={{ mr: 1 }}>
-              인원 선택 ({selectedAttendees})
-            </Button>
             <Popover
               id={id}
               open={open}
@@ -161,7 +197,7 @@ export default function PerformanceDetailPage() {
               </List>
             </Popover>
             {/* 공연 티켓 구매 클릭 시 티켓 결재 창으로 링크하는 플로우 구현해야함 */}
-            <Button variant="outlined">공연 티켓 구매</Button>
+            <Button variant="outlined" onClick={handleTicketPurchase}>공연 티켓 구매</Button>
           </Box>
         </Box>
 

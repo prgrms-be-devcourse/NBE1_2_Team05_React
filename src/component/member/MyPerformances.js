@@ -15,7 +15,7 @@ import {ArrowBack as ArrowBackIcon, ArrowForward as ArrowForwardIcon} from '@mui
 import {useNavigate} from 'react-router-dom';
 import {fetchMyPerformances} from '../../api/performanceApi'; // API 모듈에서 함수 임포트
 
-const MyPerformances = () => {
+const MyPerformances = ({memberInfo}) => {
     const [performances, setPerformances] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -26,8 +26,10 @@ const MyPerformances = () => {
         const getPerformances = async () => {
             setLoading(true);
             try {
-                const {data} = await fetchMyPerformances(page);
-                setPerformances(data);
+                const {data, performancesPerPage} = await fetchMyPerformances(page);
+                console.log(data)
+                setPerformances(data.performanceList);
+                setTotalPages(Math.ceil(data.totalElements / performancesPerPage));
             } catch (error) {
                 console.error("공연 목록을 불러오는 중 오류 발생", error);
                 // 필요 시 사용자에게 오류 메시지 표시
@@ -41,6 +43,10 @@ const MyPerformances = () => {
 
     if (loading) {
         return <p>로딩 중...</p>;
+    }
+
+    if (memberInfo.role === "일반 사용자") {
+        return <p>공연 관리자 권한 신청이 필요합니다</p>;
     }
 
     return (
@@ -60,7 +66,7 @@ const MyPerformances = () => {
                                         {performance.title}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        <strong>상태:</strong> {performance.status}
+                                        <strong>상태:</strong> {performance.status === "CONFIRMED" ? "확정" : performance.status === "NOT_CONFIRMED" ? "비확정" : performance.status === "CANCELED" ? "취소" : performance.status}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
                                         <strong>시작 시간:</strong> {new Date(performance.dateStartTime).toLocaleString()}
@@ -81,7 +87,7 @@ const MyPerformances = () => {
                                 <CardActions>
                                     <Button
                                         size="small"
-                                        onClick={() => navigate(`/performances/${performance.performanceId}`)}
+                                        onClick={() => navigate(`/performance/${performance.performanceId}`)}
                                     >
                                         자세히 보기
                                     </Button>

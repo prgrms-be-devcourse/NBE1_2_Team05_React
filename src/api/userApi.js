@@ -100,3 +100,23 @@ export const socialUserRegister = async (name) => {
     }
 }
 
+// 사용자 정보 조회
+export const getMemberInfo = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}`, {
+            withCredentials: true  // 인증 쿠키를 포함하여 요청
+        });
+
+        // 응답이 성공적일 경우 사용자 정보 반환
+        if (response.data.isSuccess) {
+            return response.data.result;  // 서버에서 반환하는 사용자 정보
+        }
+    } catch (error) {
+        // 에러 처리
+        if (error.response) {
+            return { error: error.response.data.message };
+        }
+        throw error;
+    }
+};
+

@@ -59,6 +59,7 @@ export const fetchDetailData = async (performanceId = null) => {
             remainingTickets: item.remainingTickets,
             startDate: item.startDate,
             status: item.status,
+            isUpdatable: item.isUpdatable,
             createdAt: item.createdAt,
             updatedAt: item.updatedAt,
             categories: item.categories,
@@ -79,7 +80,7 @@ export const fetchMyPerformances = async (pageNum) => {
         });
         return {
             data: response.data.result || [],
-            totalCount: response.data.totalCount || 0,
+            performancesPerPage : performancesPerPage || 0
         };
     } catch (err) {
         throw new Error(err.message);
@@ -97,6 +98,32 @@ export const registerPerformanceData = async (formData) => {
         return response.data;
     } catch (err) {
         console.error('Error registering performance data:', err);
+        throw new Error(err.message);
+    }
+};
+
+// 공연 데이터 확정짓기
+export const confirmPerformance = async (performanceId, formData) => {
+    try {
+        const response = await axios.patch(`${API_URL}/performances/${performanceId}`, formData, {
+            headers: {
+                'Content-Type' : 'application/json',
+            }
+        });
+        return response.data;
+    } catch (err) {
+        console.error('Error confirm performance data:', err);
+        throw new Error(err.message);
+    }
+};
+
+// 전체 카테고리 조회
+export const fetchCategoryData = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/performances/categories`);
+        console.log(response.data.result);
+        return response.data.result;
+    } catch (err) {
         throw new Error(err.message);
     }
 };

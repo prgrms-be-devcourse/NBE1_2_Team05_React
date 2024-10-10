@@ -15,7 +15,8 @@ export const fetchTickets = async (pageNum) => {
         });
         return {
             data: response.data || [],
-            // totalCount: response.data.totalCount || 0,
+            totalCount: response.data.totalCount || 0,
+            ticketsPerPage: ticketsPerPage || 0
         }
     } catch (error) {
         throw new Error(error.message);
@@ -23,12 +24,9 @@ export const fetchTickets = async (pageNum) => {
 };
 
 //마이페이지 티켓 삭제
-// 마이페이지 티켓 삭제
 export const deleteTicket = async (ticketId) => {
     try {
-        const response = await axios.delete(`${API_URL}`, {
-            data: { ticketId }, // DELETE 요청 본문에 ticketId 포함
-        });
+        const response = await axios.delete(`${API_URL}/${ticketId}`); // ticketId를 URL에 포함
         return response.data; // 삭제된 결과 반환
     } catch (error) {
         throw new Error(error.message);
