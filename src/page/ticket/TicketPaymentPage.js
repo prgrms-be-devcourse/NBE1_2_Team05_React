@@ -2,6 +2,7 @@
 // author : ycjung
 
 import React, {useEffect, useState} from 'react';
+import { useLocation } from 'react-router-dom'; // useLocation 추가
 import {
     Box,
     Container,
@@ -127,13 +128,17 @@ function PaymentInfo({ numPeople, performancePrice }) {
     );
 }
 
-export default function TicketPaymentPage({
-                                              imageUrl = "https://via.placeholder.com/300x200",
-                                              title = "공연 제목",
-                                              time = "0000년도 00월 00일 00시 00분",
-                                              performancePrice = 50000,
-                                              remainingTickets = 10,
-                                          }) {
+export default function TicketPaymentPage() {
+
+    const location = useLocation(); // location 훅 사용
+    const {
+        imageUrl = "https://via.placeholder.com/300x200",
+        title = "공연 제목",
+        time = "0000년도 00월 00일 00시 00분",
+        performancePrice = 50000,
+        remainingTickets = 10,
+    } = location.state || {}; // 전달된 데이터를 location.state에서 받아옴              
+    
     const [numPeople, setNumPeople] = useState(1); // 기본 인원 수 1명
     const [selectedCoupon, setSelectedCoupon] = useState(''); // 선택된 쿠폰 상태
     const [selectedCouponPercent, setSelectedCouponPercent] = useState(0); // 선택된 쿠폰의 percent (할인율)

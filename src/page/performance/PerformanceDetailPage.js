@@ -1,6 +1,6 @@
 // 공연 상세 정보 페이지
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetchDetailData, confirmPerformance } from '../../api/performanceApi'; // API 요청 함수
 import CommentList from '../../component/comment/CommentList'
 import {
@@ -22,6 +22,7 @@ import {
 
 export default function PerformanceDetailPage() {
   const { performanceId } = useParams(); // URL에서 performanceId 가져오기
+  const navigate = useNavigate(); // useNavigate 훅 사용
   const [performanceData, setPerformanceData] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedAttendees, setSelectedAttendees] = useState(0);
@@ -90,6 +91,19 @@ export default function PerformanceDetailPage() {
       console.error('Error confirming performance:', err);
     }
   };
+
+// 티켓 구매 핸들러
+const handleTicketPurchase = () => {
+    navigate(`/payment`, {
+        state: {
+            imageUrl: performanceData.imageUrl || "https://via.placeholder.com/300x200", // 이미지 URL
+            title: performanceData.title, // 공연 제목
+            time: `${performanceData.startDateTime} ~ ${performanceData.endDateTime}`, // 공연 시간
+            performancePrice: performanceData.price, // 가격
+            remainingTickets: performanceData.remainingTickets // 남은 티켓 수
+        }
+    });
+};
 
   const open = Boolean(anchorEl);
   const id = open ? 'attendees-popover' : undefined;
@@ -183,7 +197,7 @@ export default function PerformanceDetailPage() {
               </List>
             </Popover>
             {/* 공연 티켓 구매 클릭 시 티켓 결재 창으로 링크하는 플로우 구현해야함 */}
-            <Button variant="outlined">공연 티켓 구매</Button>
+            <Button variant="outlined" onClick={handleTicketPurchase}>공연 티켓 구매</Button>
           </Box>
         </Box>
 
