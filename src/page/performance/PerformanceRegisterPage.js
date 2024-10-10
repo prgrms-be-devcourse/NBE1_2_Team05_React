@@ -179,15 +179,15 @@ const PerformanceRegisterPage = () => {
                   <Grid item xs={12} sm={6}>
                     <DatePickerField
                       label="시작 날짜"
-                      value={formData.startDate}
-                      onChange={(newValue) => setFormData({ ...formData, startDate: newValue })}
+                      value={formData.dateStartTime}
+                      onChange={(newValue) => setFormData({ ...formData, dateStartTime: newValue })}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <DatePickerField
                       label="종료 날짜"
-                      value={formData.endDate}
-                      onChange={(newValue) => setFormData({ ...formData, endDate: newValue })}
+                      value={formData.dateEndTime}
+                      onChange={(newValue) => setFormData({ ...formData, dateEndTime: newValue })}
                     />
                   </Grid>
                 </Grid>
