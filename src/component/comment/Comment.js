@@ -139,7 +139,7 @@ const Comment = ({ comment, performanceId, depth = 0, onCommentUpdated, onCommen
                                     placeholder="대댓글을 입력하세요..."
                                     className="reply-textarea"
                                 />
-                                <button onClick={handleReplySubmit}>대댓글 작성</button>
+                                <button onClick={handleReplySubmit}>답글 달기</button>
                             </div>
                         )}
                     </>
