@@ -119,3 +119,4 @@ export const getMemberInfo = async () => {
         throw error;
     }
 };
+
