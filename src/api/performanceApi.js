@@ -79,7 +79,7 @@ export const fetchMyPerformances = async (pageNum) => {
         });
         return {
             data: response.data.result || [],
-            totalCount: response.data.totalCount || 0,
+            performancesPerPage : performancesPerPage || 0
         };
     } catch (err) {
         throw new Error(err.message);

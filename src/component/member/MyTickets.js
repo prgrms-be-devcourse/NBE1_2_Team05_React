@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Pagination from '@mui/material/Pagination';
 import PaginationItem from '@mui/material/PaginationItem';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Typography from "@mui/material/Typography";
@@ -20,11 +20,11 @@ const MyTickets = () => {
     useEffect(() => {
         const loadTickets = async () => {
             try {
-                const data = await fetchTickets(page); // API 호출
+                const {data, totalCount, ticketsPerPage} = await fetchTickets(page); // API 호출
                 console.log(data)
-                if (data.data.isSuccess) {
-                    setTickets(data.data.result); // 서버에서 응답받은 데이터 설정
-                    // setTotalPages(Math.ceil(data.totalCount / 6)); // 총 페이지 수 계산
+                if (data.isSuccess) {
+                    setTickets(data.result); // 서버에서 응답받은 데이터 설정
+                    setTotalPages(Math.ceil((totalCount + 1) / ticketsPerPage)); // 총 페이지 수 계산
                 }
             } catch (error) {
                 console.error("티켓 목록을 불러오는 중 오류 발생", error);
@@ -77,13 +77,16 @@ const MyTickets = () => {
                                 <strong>시작 시간:</strong> {new Date(ticket.dateStartTime).toLocaleString()}
                             </div>
                             <div>
-                                <strong>종료 시간:</strong> {ticket.dateEndTime ? new Date(ticket.dateEndTime).toLocaleString() : '정보 없음'}
+                                <strong>종료
+                                    시간:</strong> {ticket.dateEndTime ? new Date(ticket.dateEndTime).toLocaleString() : '정보 없음'}
                             </div>
                             <Stack direction="row" spacing={2}>
-                                <Button onClick={() => handleDelete(ticket.ticketId)}>티켓 취소</Button> {/* onClick에 handleDelete 연결 */}
-                                <Button onClick={() => navigate(`/performances/${ticket.performanceId}`)}>공연 자세히 보기</Button> {/* 공연 상세 페이지로 이동 */}
+                                <Button onClick={() => handleDelete(ticket.ticketId)}>티켓
+                                    취소</Button>
+                                <Button onClick={() => navigate(`/performance/${ticket.performanceId}`)}>공연 자세히
+                                    보기</Button> {/* 공연 상세 페이지로 이동 */}
                             </Stack>
-                            <hr />
+                            <hr/>
                         </div>
                     ))
                 ) : (
