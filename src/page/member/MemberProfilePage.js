@@ -1,21 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import MyPerformances from "../../component/member/MyPerformances";
 import MyTickets from "../../component/member/MyTickets";
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
-
+import MemberInfo from "../../component/member/MemberInfo";
 
 const MemberProfilePage = () => {
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        setLoading(false); // 로딩 상태를 false로 설정
-    }, []);
-
-    if (loading) {
-        return <p>로딩 중...</p>;
-    }
-
     return (
         <>
             <React.Fragment>
@@ -23,6 +13,7 @@ const MemberProfilePage = () => {
                 <Container fixed>
                     <div>
                         <h1>마이페이지</h1>
+                        <MemberInfo />
                         <h2>내가 등록한 공연</h2>
                         <MyPerformances/>
                         <hr/>
