@@ -96,13 +96,14 @@ export default function SignIn() {
             const response = await axios.post('http://localhost:8080/api/v1/members/authenticate', loginData);
 
             // 응답 데이터에서 액세스 토큰과 리프레시 토큰을 가져옴
-            const { accessToken, refreshToken } = response.data;
+            const { accessToken, refreshToken,userName } = response.data;
 
             // 토큰을 localStorage에 저장
             await localStorage.setItem('access_token', accessToken);
             await localStorage.setItem('refresh_token', refreshToken);
+            await localStorage.setItem('user_name', userName);
 
-            login();
+            login(userName);
 
 
             // 로그인 성공 메시지 표시

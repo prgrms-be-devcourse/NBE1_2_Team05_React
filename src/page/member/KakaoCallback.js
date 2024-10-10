@@ -42,12 +42,14 @@ const KakaoCallback = () => {
                         navigate('/nickname', { replace: true });
                     } else {
                         // 정상적으로 토큰을 받은 경우
-                        const { accessToken, refreshToken } = response.data;
+                        const { accessToken, refreshToken, userName } = response.data;
 
                         localStorage.setItem('access_token', accessToken);
                         localStorage.setItem('refresh_token', refreshToken);
+                        localStorage.setItem('user_name', userName);
 
-                        login(accessToken,refreshToken);
+
+                        login(userName);
 
                         setSnackbarSeverity('success');
                         setSnackbarMessage('로그인에 성공했습니다.');
