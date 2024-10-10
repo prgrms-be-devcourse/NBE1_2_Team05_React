@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // useNavigate import 추가
 import { 
   Typography, 
   Container, 
@@ -7,7 +8,8 @@ import {
   Button, 
   Paper, 
   IconButton,
-  InputAdornment
+  InputAdornment,
+  Snackbar
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -66,8 +68,8 @@ const DatePickerField = ({ label, value, onChange }) => (
 
 const PerformanceRegisterPage = () => {
     const [formData, setFormData] = useState({
-        startDate: dayjs(),
-        endDate: dayjs(),
+        dateStartTime: dayjs(),
+        dateEndTime: dayjs(),
         title: '',
         location: '',
         address: '',
@@ -77,23 +79,22 @@ const PerformanceRegisterPage = () => {
       });
     const [image, setImage] = useState(null);
     const [error, setError] = useState('');
+    const [snackbarOpen, setSnackbarOpen] = useState(false); // Snackbar 상태
+    const navigate = useNavigate(); // useNavigate 훅 사용
   
-    const handleSubmit = (event) => {
-      event.preventDefault();
-      // Handle form submission
-      
-      // 날짜 포맷팅
-      const formattedStartDate = formData.startDate ? formData.startDate.format('YYYY-MM-DD') : null;
-      const formattedEndDate = formData.endDate ? formData.endDate.format('YYYY-MM-DD') : null;
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        console.log('Form submitted', formData);
 
-    // formData 업데이트
-      const updatedFormData = {
-        ...formData,
-        startDate: formattedStartDate,
-        endDate: formattedEndDate,
-      };
-      console.log('Form submitted', updatedFormData );
-      registerPerformanceData(updatedFormData);
+        try {
+            await registerPerformanceData(formData); // 공연 등록 함수 호출
+            setSnackbarOpen(true); // 알림 켜기
+            setTimeout(() => {
+                navigate('/'); // 메인 페이지로 이동
+            }, 2000); // 2초 후에 이동
+        } catch (err) {
+            setError(err.message); // 에러 처리
+        }
     };
 
     const handleImageChange = (event) => {
@@ -110,6 +111,10 @@ const PerformanceRegisterPage = () => {
         } else {
           console.error('File input not found');
         }
+    };
+
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false); // Snackbar 닫기
     };
   
     return (
@@ -214,6 +219,12 @@ const PerformanceRegisterPage = () => {
               등록
             </Button>
           </form>
+          <Snackbar
+            open={snackbarOpen}
+            onClose={handleSnackbarClose}
+            message="공연이 등록되었습니다!"
+            autoHideDuration={2000} // 2초 후 자동으로 숨김
+          />
         </Container>
       </LocalizationProvider>
     );

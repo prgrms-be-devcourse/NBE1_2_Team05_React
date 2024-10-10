@@ -59,6 +59,7 @@ export const fetchDetailData = async (performanceId = null) => {
             remainingTickets: item.remainingTickets,
             startDate: item.startDate,
             status: item.status,
+            isUpdatable: item.isUpdatable,
             createdAt: item.createdAt,
             updatedAt: item.updatedAt,
             categories: item.categories,
@@ -97,6 +98,21 @@ export const registerPerformanceData = async (formData) => {
         return response.data;
     } catch (err) {
         console.error('Error registering performance data:', err);
+        throw new Error(err.message);
+    }
+};
+
+// 공연 데이터 확정짓기
+export const confirmPerformance = async (performanceId, formData) => {
+    try {
+        const response = await axios.patch(`${API_URL}/performances/${performanceId}`, formData, {
+            headers: {
+                'Content-Type' : 'application/json',
+            }
+        });
+        return response.data;
+    } catch (err) {
+        console.error('Error confirm performance data:', err);
         throw new Error(err.message);
     }
 };
