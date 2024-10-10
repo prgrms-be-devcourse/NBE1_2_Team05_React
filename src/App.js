@@ -15,6 +15,10 @@ import KakaoCallback from "./page/member/KakaoCallback";
 import NaverCallBack from "./page/member/NaverCallBack";
 import MemberProfilePage from "./page/member/MemberProfilePage";
 import TicketPaymentPage from "./page/ticket/TicketPaymentPage";
+import CommentTestPage from "./page/CommentTestPage";
+import { useParams } from 'react-router-dom';
+
+
 
 function Layout() {
     const location = useLocation();
@@ -50,10 +54,16 @@ function Layout() {
                     path="/profile"
                     element={isLoggedIn ? <UserProfilePage /> : <Navigate to="/signin" />}
                 />
+
             </Routes>
         </div>
     );
 }
+
+const CommentTestPageWrapper = () => {
+    const { performanceId } = useParams();
+    return <CommentTestPage performanceId={performanceId} />;
+};
 
 function App() {
     return (

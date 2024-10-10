@@ -5,6 +5,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
@@ -106,7 +107,66 @@ function Header() {
                         <img src={somunLogo} alt="소문 로고" style={{ width: '100px', height: '60px', marginRight: '8px' }} />
                     </Typography>
 
-                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                    <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}> {/*축소 카테고리*/}
+                        <IconButton
+                            size="large"
+                            aria-label="account of current user"
+                            aria-controls="menu-appbar"
+                            aria-haspopup="true"
+                            onClick={handleOpenNavMenu}
+                            color="inherit"
+                        >
+                            <MenuIcon sx={{ color: 'black' }} />
+                        </IconButton>
+
+                        <Menu
+                            id="menu-appbar"
+                            anchorEl={state.anchorElNav}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                            }}
+                            keepMounted
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}
+                            open={Boolean(state.anchorElNav)}
+                            onClose={handleCloseNavMenu}
+                            sx={{ display: { xs: 'block', md: 'none' } }}
+                        >
+                            {pages.map((page) => (
+                                <MenuItem
+                                    key={page.name}
+                                    onClick={() => handlePageNavigation(page)}  // handlePageNavigation 호출
+                                >
+                                    <Typography sx={{ textAlign: 'center' }}>{page.name}</Typography>
+                                </MenuItem>
+                            ))}
+                        </Menu>
+                    </Box>
+
+                    <Typography
+                        variant="h5"
+                        noWrap
+                        component="a"
+                        href="/"
+                        sx={{
+                            mr: 2,
+                            display: {xs: 'flex', md: 'none'},
+                            flexGrow: 1,
+                            fontFamily: 'monospace',
+                            fontWeight: 700,
+                            letterSpacing: '.3rem',
+                            /*color: 'inherit',*/
+                            color: 'black',
+                            textDecoration: 'none',
+                        }}
+                    >
+                        <img src={somunLogo} alt="소문 로고" style={{width: '100px', height: '60px', marginRight: '8px'}}/>
+                    </Typography>
+
+                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}> {/*확대 카테고리*/}
                         {pages.map((page) => (
                             <Button
                                 key={page.name}
