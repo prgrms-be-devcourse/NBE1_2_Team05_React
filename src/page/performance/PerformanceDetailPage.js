@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchDetailData } from '../../api/performanceApi'; // API 요청 함수
+import CommentList from '../../component/comment/CommentList'
 import {
   Container,
   Typography,
@@ -185,10 +186,9 @@ export default function PerformanceDetailPage() {
 
         <Grid item xs={12} sm={4}>
             <Typography variant="subtitle1">공연 리뷰</Typography>
-            <Typography>...</Typography>
         </Grid>
-
-        {/* <CommentSection /> 댓글 컴포넌트 붙여야함 */}
+        {/* 댓글 컴포넌트 추가 */}
+        <CommentList performanceId={performanceId} />
       </Paper>
     </Container>
   );
