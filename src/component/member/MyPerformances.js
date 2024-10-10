@@ -26,8 +26,9 @@ const MyPerformances = () => {
         const getPerformances = async () => {
             setLoading(true);
             try {
-                const {data} = await fetchMyPerformances(page);
+                const { data, totalCount, performancesPerPage } = await fetchMyPerformances(page);
                 setPerformances(data);
+                setTotalPages(Math.ceil(totalCount / performancesPerPage));
             } catch (error) {
                 console.error("공연 목록을 불러오는 중 오류 발생", error);
                 // 필요 시 사용자에게 오류 메시지 표시
@@ -60,7 +61,7 @@ const MyPerformances = () => {
                                         {performance.title}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        <strong>상태:</strong> {performance.status}
+                                        <strong>상태:</strong> {performance.status === "CONFIRMED" ? "확정" : performance.status === "NOT_CONFIRMED" ? "비확정" : performance.status === "CANCELED" ? "취소" : performance.status}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
                                         <strong>시작 시간:</strong> {new Date(performance.dateStartTime).toLocaleString()}
