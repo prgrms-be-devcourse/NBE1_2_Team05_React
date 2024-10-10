@@ -186,7 +186,6 @@ export default function PerformanceDetailPage() {
 
         <Grid item xs={12} sm={4}>
             <Typography variant="subtitle1">공연 리뷰</Typography>
-            <Typography>...</Typography>
         </Grid>
         {/* 댓글 컴포넌트 추가 */}
         <CommentList performanceId={performanceId} />
