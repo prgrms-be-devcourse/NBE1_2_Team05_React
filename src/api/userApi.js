@@ -1,6 +1,8 @@
-import axios from "axios";
+import axios from "./axiosInterceptor";
+// import axios from "axios";
 
-const API_BASE_URL = 'http://localhost:8080/api/v1/members';  // 서버 주소와 Base URL을 함께 정의
+
+const API_BASE_URL = 'http://localhost:8080/api/v1/members';
 
 // 이메일 중복 체크
 export const validateEmailAndCheckDuplicate = async (email) => {
@@ -68,24 +70,33 @@ export const checkName = async (name) => {
 }
 
 export const socialUserRegister = async (name) => {
-    try{
+    try {
         const response = await axios.post(`${API_BASE_URL}/oauth/register`, {
             name
         },{
             withCredentials: true  // 세션 쿠키를 포함하도록 설정
         });
 
-        if(response.data.isSuccess){
-            return {registerCheck: true};
+        // 응답에서 accessToken과 refreshToken이 있는지 확인하고 저장
+        if (response.data.accessToken && response.data.refreshToken) {
+            localStorage.setItem('access_token', response.data.accessToken);
+            localStorage.setItem('refresh_token', response.data.refreshToken);
+            localStorage.setItem('user_name', response.data.userName);
+
+
+            return { registerCheck: true, message: '회원가입이 성공적으로 완료되었습니다.' };
+        } else {
+            return { registerCheck: false, message: '토큰 발급에 실패했습니다.' };
         }
-    }catch(error){
-        if(error.response){
+    } catch (error) {
+        if (error.response) {
             const errorData = error.response.data;
-            if(errorData.code !== "COMMON200"){
-                return {registerCheck:false, message: errorData.message};
-            }else{
-                return {registerCheck:false, message: "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."};
+            if (errorData.code !== "COMMON200") {
+                return { registerCheck: false, message: errorData.message };
+            } else {
+                return { registerCheck: false, message: "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요." };
             }
         }
     }
 }
+
