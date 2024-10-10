@@ -1,10 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import { getMemberInfo } from "../../api/userApi";
+import {Button} from "@mui/material";
+import {useNavigate} from 'react-router-dom';
+
 
 const MemberInfo = () => {
     const [loading, setLoading] = useState(true);
     const [memberInfo, setMemberInfo] = useState(null);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchMemberInfo = async () => {
@@ -37,6 +41,12 @@ const MemberInfo = () => {
                     <p>권한: {memberInfo.role}</p>
                 </>
             )}
+            <Button
+                size="small"
+                onClick={() => navigate(`/member/category`)}
+            >
+                선호하는 카테고리 수정하기
+            </Button>
         </div>
     );
 };

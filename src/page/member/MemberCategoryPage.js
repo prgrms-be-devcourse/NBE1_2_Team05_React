@@ -110,7 +110,7 @@ export default function MemberCategoryPage() {
 
             // 1초 후 로그인 페이지로 이동
             setTimeout(() => {
-                navigate('/signin');
+                navigate('/member/profile');
             }, 1000);
         } catch (error) {
             console.error('카테고리를 제출하는 중 오류가 발생했습니다:', error);
