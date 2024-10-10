@@ -1,19 +1,51 @@
+// src/components/comment/Comment.js
+
 import React, { useState } from 'react';
 import { updateComment, deleteComment } from '../../api/commentApi';
 import './Comment.css';
 
-const Comment = ({ comment, depth = 0, onCommentUpdated, onCommentDeleted }) => {
-    const [isEditing, setIsEditing] = useState(false); // 수정 모드 여부
-    const [content, setContent] = useState(comment.content); // 수정할 댓글 내용
-    const [isDeleted, setIsDeleted] = useState(comment.commentStatus === 'DELETED'); // 삭제 여부 상태
+// JWT에서 사용자 정보를 추출하는 함수
+const getUserInfoFromToken = (token) => {
+    if (!token) return null;
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            window.atob(base64)
+                .split('')
+                .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
+                .join('')
+        );
+        const parsedToken = JSON.parse(jsonPayload);
+        console.log('Parsed token:', parsedToken); // 디버그용 출력
+        return parsedToken;
+    } catch (error) {
+        console.error('토큰 파싱 실패:', error);
+        return null;
+    }
+};
 
-    // 댓글 수정 완료 처리 함수
+const Comment = ({ comment, depth = 0, onCommentUpdated, onCommentDeleted }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [content, setContent] = useState(comment.content);
+    const [isDeleted, setIsDeleted] = useState(comment.commentStatus === 'DELETED');
+
+    // 로컬 스토리지에서 access token을 가져와 JWT 디코딩
+    const accessToken = localStorage.getItem('access_token');
+    const userInfo = getUserInfoFromToken(accessToken);
+    const userEmail = userInfo ? userInfo.email : null; // JWT에서 이메일 추출
+
+    // 현재 로그인한 사용자가 댓글 작성자인지 확인
+    const isAuthor = userEmail === comment.email; // JWT 이메일과 댓글 작성자 이메일 비교
+
+    console.log('userEmail:', userEmail, 'comment.email:', comment.email, 'isAuthor:', isAuthor); // 디버그용 출력
+
     const handleUpdate = async () => {
         try {
-            await updateComment(comment.commentId, content); // 서버에 수정 요청
-            setIsEditing(false); // 수정 모드 종료
+            await updateComment(comment.commentId, content);
+            setIsEditing(false);
             if (onCommentUpdated) {
-                onCommentUpdated({ ...comment, content }); // 수정된 댓글을 부모로 전달
+                onCommentUpdated({ ...comment, content });
             }
         } catch (error) {
             console.error('댓글 수정 실패:', error);
@@ -21,16 +53,15 @@ const Comment = ({ comment, depth = 0, onCommentUpdated, onCommentDeleted }) => 
         }
     };
 
-    // 댓글 삭제 처리 함수
     const handleDelete = async () => {
         if (window.confirm('댓글을 삭제하시겠습니까?')) {
             try {
-                const response = await deleteComment(comment.commentId); // 서버에 삭제 요청
-                const { commentStatus } = response; // 서버에서 반환한 상태 사용
+                const response = await deleteComment(comment.commentId);
+                const { commentStatus } = response;
                 if (commentStatus === 'DELETED') {
-                    setIsDeleted(true); // 삭제된 상태로 즉시 설정
+                    setIsDeleted(true);
                     if (onCommentDeleted) {
-                        onCommentDeleted(comment.commentId); // 삭제된 댓글을 부모로 전달
+                        onCommentDeleted(comment.commentId);
                     }
                 }
             } catch (error) {
@@ -50,7 +81,6 @@ const Comment = ({ comment, depth = 0, onCommentUpdated, onCommentDeleted }) => 
                     </div>
                 </div>
 
-                {/* 삭제된 댓글일 경우 "댓글이 삭제되었습니다"로 표시 */}
                 {isDeleted ? (
                     <div className="comment-text">댓글이 삭제되었습니다</div>
                 ) : (
@@ -69,16 +99,14 @@ const Comment = ({ comment, depth = 0, onCommentUpdated, onCommentDeleted }) => 
                     )
                 )}
 
-                {/* 수정 및 삭제 버튼 (삭제되지 않았을 때만 표시) */}
-                {!isDeleted && !isEditing && (
+                {!isDeleted && isAuthor && !isEditing && (
                     <>
                         <button onClick={() => setIsEditing(true)}>수정</button>
-                        <button onClick={handleDelete}>삭제</button> {/* 삭제 버튼 */}
+                        <button onClick={handleDelete}>삭제</button>
                     </>
                 )}
             </div>
 
-            {/* 대댓글이 있으면 재귀적으로 Comment 컴포넌트 호출 */}
             {comment.replies && comment.replies.length > 0 && (
                 comment.replies.map(reply => (
                     <Comment
@@ -86,7 +114,7 @@ const Comment = ({ comment, depth = 0, onCommentUpdated, onCommentDeleted }) => 
                         comment={reply}
                         depth={depth + 1}
                         onCommentUpdated={onCommentUpdated}
-                        onCommentDeleted={onCommentDeleted} // 삭제 처리 콜백 추가
+                        onCommentDeleted={onCommentDeleted}
                     />
                 ))
             )}
