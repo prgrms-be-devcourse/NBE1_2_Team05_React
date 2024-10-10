@@ -54,8 +54,7 @@ function Layout() {
                     path="/profile"
                     element={isLoggedIn ? <UserProfilePage /> : <Navigate to="/signin" />}
                 />
-                {/* 댓글 테스트 페이지 추가 */}
-                <Route path="/comments/:performanceId" element={<CommentTestPageWrapper />} />
+
             </Routes>
         </div>
     );
