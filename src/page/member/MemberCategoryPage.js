@@ -110,7 +110,7 @@ export default function MemberCategoryPage() {
 
             // 1초 후 로그인 페이지로 이동
             setTimeout(() => {
-                navigate('/signin');
+                navigate('/member/profile');
             }, 1000);
         } catch (error) {
             console.error('카테고리를 제출하는 중 오류가 발생했습니다:', error);
@@ -150,7 +150,7 @@ export default function MemberCategoryPage() {
                         src={SomunIcon}
                         alt="소문 로고"
                         style={{ width: '40%', height: '40%', marginBottom: '10px', cursor: 'pointer' }}
-                        onClick={() => navigate('/signin')}
+                        onClick={() => navigate('/')}
                     />
 
                     <Typography
