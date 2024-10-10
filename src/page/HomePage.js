@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom'; // Link 임포트
 const HomePage = () => {
     const [page, setPage] = useState(1);
     const itemsPerPage = 16; // 페이지당 아이템 수
-    const totalItems = 100; // 총 아이템 수 (예시로 100개)
+    const [totalItems, setTotalItems] = useState(0); // 총 아이템 수 (예시로 100개)
 
     const [data, setData] = useState([]); // 데이터를 저장할 상태
     const [loading, setLoading] = useState(true); // 로딩 상태
@@ -34,21 +34,41 @@ const HomePage = () => {
     const loadData = async () => {
         setLoading(true);
         try {
-            const performances = await fetchData(page, selectedCategory, searchTerm);
+            const { totalElements, performances } = await fetchData(page, selectedCategory, searchTerm);
+            console.log(totalElements);
             console.log(performances);
-            setData(performances);
+
+            if (performances && Array.isArray(performances)) {
+                const performanceData = performances.map(item => ({
+                    performanceId: item.performanceId,
+                    memberName: item.memberName,
+                    imageUrl: item.imageUrl,
+                    title: item.title,
+                    startDateTime: item.dateStartTime,
+                    endDateTime: item.dateEndTime
+                }));
+    
+                setTotalItems(totalElements);
+                setData(performanceData);
+            } else {
+                setData([])
+                setError('Performances is not an array or is undefined');
+            }
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
     };
-
-    // 컴포넌트가 마운트될 때 전체 데이터 조회
+    // 컴포넌트가 마운트될 때 카테고리 데이터 조회
     useEffect(() => {
         loadCategories(); // 카테고리 데이터 가져오기
-        loadData(page); // 초기 데이터 가져오기
-    }, [page]); // 페이지가 변경될 때마다 호출
+    }, []);
+
+    // 페이지, 카테고리, 검색어 변경 시 데이터 로드
+    useEffect(() => {
+        loadData(); // 초기 데이터 가져오기
+    }, [page, selectedCategory, searchTerm]); // 페이지가 변경될 때마다 호출
 
     // 로딩 상태 처리
     if (loading) {
@@ -76,19 +96,21 @@ const HomePage = () => {
 
     const handleKeyPress = (event) => {
         if (event.key === 'Enter') {
-            fetchData(1, selectedCategory, searchTerm); // 엔터 키가 눌리면 검색어로 데이터 가져오기
+            setPage(1);
         }
     };
 
     // 카테고리 버튼 클릭 시 데이터 가져오기
     const handleCategoryClick = (categoryId) => {
-        setSelectedCategory(categoryId); // 선택된 카테고리 상태 업데이트
-        // "전체" 카테고리가 선택되면 모든 데이터를 가져옵니다.
-        if (categoryId === null) {
-            fetchData(1, null, searchTerm); // 전체 데이터 조회
-        } else {
-            fetchData(1, categoryId, searchTerm); // 선택된 카테고리와 현재 검색어로 데이터 가져오기
+        console.log(selectedCategory);
+        console.log(categoryId);
+        if (categoryId == 0 || selectedCategory == categoryId) {
+            setSelectedCategory(null); // 선택된 카테고리 상태 업데이트
         }
+        else {
+            setSelectedCategory(categoryId); // 선택된 카테고리 상태 업데이트
+        }
+        setPage(1);
     };
 
     // 공연 데이터를 불러와서 렌더링
@@ -113,7 +135,7 @@ const HomePage = () => {
                             <Button
                                 key={category.categoryId} // 고유한 키 사용
                                 variant="contained"
-                                color="primary"
+                                color={selectedCategory === category.categoryId ? "secondary" : "primary"} // 선택된 카테고리 색상 변경
                                 style={{ marginRight: '10px' }}
                                 onClick={() => handleCategoryClick(category.categoryId)} // 카테고리 클릭 시 함수 호출
                             >
@@ -131,9 +153,9 @@ const HomePage = () => {
                 </div>
 
                 <div className="performance-list">
-                    {data.map((performance, index) => (
+                    {data.map((performance) => (
                         <PerformanceCard
-                            key={index}
+                            key={performance.performanceId}
                             {...performance}
                             className="performance-card" // 클래스 추가
                             />

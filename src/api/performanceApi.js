@@ -30,14 +30,11 @@ export const fetchData = async (pageNum = 1, category = null, search = '') => {
                 search: search, // 검색어 추가
             }
         });
-        return response.data.result.map(item => ({
-            performanceId: item.performanceId,
-            memberName: item.memberName,
-            imageUrl: item.imageUrl,
-            title: item.title,
-            startDateTime: item.dateStartTime,
-            endDateTime: item.dateEndTime
-        }));
+        console.log(response.data.result);
+        return {
+            totalElements: response.data.result.totalElements,
+            performances: response.data.result.performanceList || []
+        };
     } catch (err) {
         throw new Error(err.message);
     }
