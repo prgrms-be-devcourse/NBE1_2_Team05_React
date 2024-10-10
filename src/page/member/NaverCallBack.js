@@ -49,7 +49,7 @@ const NaverCallback = () => {
                         localStorage.setItem('access_token', accessToken);
                         localStorage.setItem('refresh_token', refreshToken);
 
-                        login(accessToken,refreshToken);
+                        login();
 
                         setSnackbarSeverity('success');
                         setSnackbarMessage('로그인에 성공했습니다.');
