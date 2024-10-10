@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // useNavigate import 추가
 import { 
   Typography, 
@@ -7,6 +7,7 @@ import {
   TextField, 
   Button, 
   Paper, 
+  Box,
   IconButton,
   InputAdornment,
   Snackbar
@@ -18,7 +19,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import dayjs from 'dayjs';
-import { registerPerformanceData } from '../../api/performanceApi'; // API 함수 임포트
+import { fetchCategories, registerPerformanceData } from '../../api/performanceApi'; // API 함수 임포트
 
 const UploadBox = styled(Paper)(({ theme }) => ({
   height: '200px',
@@ -76,18 +77,37 @@ const PerformanceRegisterPage = () => {
         description: '',
         maxAudience: '',
         organizer: '',
+        categories: []
       });
+    const [categories, setCategories] = useState([]);
+    const [favoriteCategories, setFavoriteCategories] = useState([]);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [hasChanges, setHasChanges] = useState(false); // 카테고리 변경 여부
     const [image, setImage] = useState(null);
     const [error, setError] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false); // Snackbar 상태
     const navigate = useNavigate(); // useNavigate 훅 사용
   
+    useEffect(() => {
+        const getCategories = async () => {
+          try {
+            const data = await fetchCategories(); // ID로 데이터 요청
+            console.log(data)
+            setCategories(data);
+          } catch (err) {
+            setError(err.message);
+          }
+        };
+    
+        getCategories();
+      }, []); // performanceId가 변경될 때마다 데이터 요청
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         console.log('Form submitted', formData);
 
         try {
-            await registerPerformanceData(formData); // 공연 등록 함수 호출
+            await registerPerformanceData({...formData, categories: selectedCategories}); // 공연 등록 함수 호출
             setSnackbarOpen(true); // 알림 켜기
             setTimeout(() => {
                 navigate('/'); // 메인 페이지로 이동
@@ -115,6 +135,30 @@ const PerformanceRegisterPage = () => {
 
     const handleSnackbarClose = () => {
         setSnackbarOpen(false); // Snackbar 닫기
+    };
+
+    // 카테고리 선택 핸들러
+    const handleCategorySelect = (categoryId) => {
+        let updatedCategories;
+        if (selectedCategories.includes(categoryId)) {
+            updatedCategories = selectedCategories.filter(id => id !== categoryId);
+        } else if (selectedCategories.length < 3) {
+            updatedCategories = [...selectedCategories, categoryId];
+        } else {
+            return;
+        }
+
+        setSelectedCategories(updatedCategories);
+        // 기존 선호 카테고리와 비교하여 변경 사항 있는지 확인
+        setHasChanges(!areArraysEqual(favoriteCategories.map(cat => cat.categoryId), updatedCategories));
+    };
+
+    // 배열 비교 함수 (순서와 상관없이 두 배열이 같은지 확인)
+    const areArraysEqual = (arr1, arr2) => {
+        if (arr1.length !== arr2.length) return false;
+        const sortedArr1 = [...arr1].sort();
+        const sortedArr2 = [...arr2].sort();
+        return sortedArr1.every((value, index) => value === sortedArr2[index]);
     };
   
     return (
@@ -203,9 +247,35 @@ const PerformanceRegisterPage = () => {
                     onChange={handleImageChange} 
                     style={{ display: 'none' }} 
                 />
-                <Button fullWidth variant="contained" color="secondary" sx={{ mt: 2 }} onClick={triggerFileInput}>
+                <Button fullWidth variant="contained" color="secondary" sx={{ mt: 2, mb: 5 }} onClick={triggerFileInput}>
                   추가 버튼
                 </Button>
+
+                {/* 카테고리 선택 버튼들 */}
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'center' }}>
+                        {categories.map((category) => {
+                            const isSelected = selectedCategories.includes(category.categoryId);
+                            return (
+                                <Button
+                                    key={category.categoryId}
+                                    variant="contained"
+                                    onClick={() => handleCategorySelect(category.categoryId)}
+                                    sx={{
+                                        backgroundColor: isSelected ? '#007bff' : '#f0f0f0',
+                                        color: isSelected ? '#fff' : '#000',
+                                        borderRadius: '20px',
+                                        padding: '10px 20px',
+                                        fontSize: '14px',
+                                        textTransform: 'none',
+                                    }}
+                                >
+                                    {category.nameKr}
+                                </Button>
+                            );
+                        })}
+                    </Box>
+
+
               </Grid>
             </Grid>
             <Button

@@ -116,3 +116,14 @@ export const confirmPerformance = async (performanceId, formData) => {
         throw new Error(err.message);
     }
 };
+
+// 전체 카테고리 조회
+export const fetchCategoryData = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/performances/categories`);
+        console.log(response.data.result);
+        return response.data.result;
+    } catch (err) {
+        throw new Error(err.message);
+    }
+};
