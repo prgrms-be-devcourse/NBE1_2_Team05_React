@@ -4,7 +4,7 @@ import NaverIcon from '../../assets/image/btn_naver.svg'; // 로컬 SVG 파일�
 const NaverLoginButton = ({buttonText = "네이버 로그인"}) => {
 
     const clientId = 'e5JWZUN_qtfvPpP7LNst';
-    const redirectUri = 'http://localhost:8080/api/v1/members/oauth/NAVER';
+    const redirectUri = 'http://localhost:3000/naver-callback';
     const responseType = 'code';
 
 
