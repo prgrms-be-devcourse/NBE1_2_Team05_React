@@ -17,6 +17,7 @@ import MemberProfilePage from "./page/member/MemberProfilePage";
 import TicketPaymentPage from "./page/ticket/TicketPaymentPage";
 import CommentTestPage from "./page/CommentTestPage";
 import { useParams } from 'react-router-dom';
+import MemberRoleChangePage from "./page/member/MemberRoleChangePage";
 
 
 
@@ -42,6 +43,7 @@ function Layout() {
                 <Route path="/member/profile" element={<MemberProfilePage/>}/>
                 <Route path="/kakao-callback" element={<KakaoCallback />} />
                 <Route path="/naver-callback" element={<NaverCallBack />} />
+                <Route path="/member/role" element={<MemberRoleChangePage />} />
 
 
                 {/* 로그인 여부에 따라 페이지 접근 제한 */}

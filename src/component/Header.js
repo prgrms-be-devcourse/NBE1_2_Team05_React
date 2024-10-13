@@ -28,7 +28,7 @@ const PAGE_LINKS = {
     LOGOUT: { name: '로그아웃', link: '/' },
     MY_PAGE: { name: '마이페이지', link: '/member/profile' },
     MY_TICKETS: { name: '나의 티켓', link: '/mytickets' },
-    MANAGER_APPLY: { name: '공연관리자 신청', link: '/managerapply' },
+    MANAGER_APPLY: { name: '공연관리자 신청', link: '/member/role' },
 };
 
 const pages = [PAGE_LINKS.CATEGORY_1, PAGE_LINKS.CATEGORY_2, PAGE_LINKS.CATEGORY_3];
