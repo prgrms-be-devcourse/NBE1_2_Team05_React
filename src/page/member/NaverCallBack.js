@@ -64,14 +64,20 @@ const NaverCallback = () => {
 
 
                 } catch (error) {
-                    console.error('네이버 로그인 중 오류가 발생했습니다:', error);
-                    setSnackbarSeverity('error');
-                    setSnackbarMessage('네이버 로그인 중 오류가 발생했습니다.');
+                    // 에러 상태 코드에 따른 메시지 처리
+                    if (error.response && error.response.status === 409) {
+                        setSnackbarSeverity('error');
+                        setSnackbarMessage('이미 사용중인 이메일입니다. 다른 소셜 이메일로 회원가입 시도해주세요');
+                    } else {
+                        setSnackbarSeverity('error');
+                        setSnackbarMessage('네이버 로그인 중 오류가 발생했습니다.');
+                    }
+
                     setOpenSnackbar(true);
 
                     setTimeout(() => {
                         navigate('/signin');
-                    }, 1000);
+                    }, 2000);
                 }
             };
 
