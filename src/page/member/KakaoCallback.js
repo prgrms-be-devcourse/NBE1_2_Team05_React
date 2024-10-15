@@ -5,7 +5,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import {useAuth} from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -14,11 +14,12 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const KakaoCallback = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const {login} = useAuth();
+    const { login } = useAuth();
 
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+    const [isRequestSent, setIsRequestSent] = useState(false);  // 중복 요청 방지 상태
 
     const handleSnackbarClose = () => {
         setOpenSnackbar(false);
@@ -28,9 +29,11 @@ const KakaoCallback = () => {
         const searchParams = new URLSearchParams(location.search);
         const code = searchParams.get('code');
 
-        if (code) {
+        // 요청을 한 번도 보내지 않았고, code가 있을 경우에만 요청
+        if (code && !isRequestSent) {
             const fetchTokens = async () => {
                 try {
+                    setIsRequestSent(true);  // 첫 번째 요청 이후 요청 방지 플래그 설정
                     const response = await axios.post(`http://localhost:8080/api/v1/members/oauth/KAKAO`, {
                         code: code,
                         state: ""
@@ -38,11 +41,9 @@ const KakaoCallback = () => {
 
                     // 응답에서 리디렉션 여부를 확인
                     if (response.data === 'redirect nicknamePage') {
-                        // 닉네임 설정 화면으로 리디렉션
                         navigate('/nickname', { replace: true });
                     } else {
-                        // 정상적으로 토큰을 받은 경우
-                        const { accessToken, refreshToken, userName } = response.data;
+                        const { accessToken, refreshToken, userName, firstLogin } = response.data;
 
                         localStorage.setItem('access_token', accessToken);
                         localStorage.setItem('refresh_token', refreshToken);
@@ -54,13 +55,23 @@ const KakaoCallback = () => {
                         setSnackbarMessage('로그인에 성공했습니다.');
                         setOpenSnackbar(true);
 
-                        setTimeout(() => {
-                            navigate('/', { replace: true });
-                        }, 1000);
-                    }
+                        if (firstLogin === true) {
+                            await axios.patch(`http://localhost:8080/api/v1/members/first-login`);
 
+                            setTimeout(() => {
+                                navigate('/member/category', { state: { from: '/signin' } });
+
+                            }, 1000);
+                        }
+
+
+                        else{
+                            setTimeout(() => {
+                                navigate('/', { replace: true });
+                            }, 1000);
+                        }
+                    }
                 } catch (error) {
-                    // 에러 상태 코드에 따른 메시지 처리
                     if (error.response && error.response.status === 409) {
                         setSnackbarSeverity('error');
                         setSnackbarMessage('이미 사용중인 이메일입니다. 다른 소셜 이메일로 회원가입 시도해주세요');
@@ -79,8 +90,7 @@ const KakaoCallback = () => {
 
             fetchTokens();
         }
-    }, [location.search, navigate]);
-
+    }, [location.search, navigate, isRequestSent]);
 
     return (
         <div>
