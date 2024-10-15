@@ -96,7 +96,7 @@ export default function SignIn() {
             const response = await axios.post('http://localhost:8080/api/v1/members/authenticate', loginData);
 
             // 응답 데이터에서 액세스 토큰과 리프레시 토큰을 가져옴
-            const { accessToken, refreshToken,userName } = response.data;
+            const { accessToken, refreshToken,userName, firstLogin } = response.data;
 
             // 토큰을 localStorage에 저장
             await localStorage.setItem('access_token', accessToken);
@@ -111,10 +111,20 @@ export default function SignIn() {
             setSnackbarMessage("로그인에 성공했습니다.");
             setOpenSnackbar(true);
 
-            // 로그인 후 리다이렉트 (예: 홈으로 이동)
-            setTimeout(() => {
-                navigate('/');
-            }, 1000);
+            if (firstLogin === true) {
+                await axios.patch(`http://localhost:8080/api/v1/members/first-login`);
+
+                setTimeout(() => {
+                    navigate('/member/category', { replace: true });
+                }, 1000);
+            }
+
+            else{
+                // 로그인 후 리다이렉트 (예: 홈으로 이동)
+                setTimeout(() => {
+                    navigate('/');
+                }, 1000);
+            }
 
         } catch (error) {
             setSnackbarSeverity('error');

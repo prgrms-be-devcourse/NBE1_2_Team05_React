@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -6,7 +6,7 @@ import Container from '@mui/material/Container';
 import axios from '../../api/axiosInterceptor';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import SomunIcon from '../../assets/image/somun_icon.png';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import CssBaseline from '@mui/material/CssBaseline';  // CssBaseline 추가
@@ -39,6 +39,7 @@ export default function MemberCategoryPage() {
     const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Snackbar 종류
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     // 카테고리 전체 목록 및 사용자 선호 카테고리 불러오기
     useEffect(() => {
@@ -108,9 +109,14 @@ export default function MemberCategoryPage() {
             setSnackbarSeverity('success');
             setOpenSnackbar(true);
 
-            // 1초 후 로그인 페이지로 이동
             setTimeout(() => {
-                navigate('/member/profile');
+                // 이전 페이지가 로그인 페이지인지 확인하거나 명시적으로 홈으로 리다이렉트
+                const previousPage = location.state?.from;
+                if (previousPage && previousPage === '/signin') {
+                    navigate('/'); // 로그인 페이지가 이전 페이지면 홈으로 이동
+                } else {
+                    navigate(-1);  // 그렇지 않으면 이전 페이지로 이동
+                }
             }, 1000);
         } catch (error) {
             console.error('카테고리를 제출하는 중 오류가 발생했습니다:', error);
