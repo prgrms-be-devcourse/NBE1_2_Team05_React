@@ -92,7 +92,8 @@ export const registerPerformanceData = async (formData) => {
     try {
         const response = await axios.post(`${API_URL}/performances`, formData, {
             headers: {
-                'Content-Type' : 'application/json',
+                // 'Content-Type' : 'application/json',
+                'Content-Type': 'multipart/form-data',
             }
         });
         return response.data;
