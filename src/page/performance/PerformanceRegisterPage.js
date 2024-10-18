@@ -93,6 +93,7 @@ const PerformanceRegisterPage = () => {
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [hasChanges, setHasChanges] = useState(false); // 카테고리 변경 여부
     const [image, setImage] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState(null); // 미리보기 URL 저장
     const [error, setError] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false); // Snackbar 상태
     const navigate = useNavigate(); // useNavigate 훅 사용
@@ -103,7 +104,6 @@ const PerformanceRegisterPage = () => {
         const getCategories = async () => {
             try {
                 const data = await fetchCategories(); // ID로 데이터 요청
-                console.log(data)
                 setCategories(data);
             } catch (err) {
                 setError(err.message);
@@ -117,8 +117,29 @@ const PerformanceRegisterPage = () => {
         event.preventDefault();
         console.log('Form submitted', formData);
 
+        // FormData 객체 생성
+        const formDataToSend = new FormData();
+
+        // JSON 데이터를 FormData에 추가
+        formDataToSend.append('performanceData', new Blob([JSON.stringify({
+            title: formData.title,
+            dateStartTime: formData.dateStartTime,
+            dateEndTime: formData.dateEndTime,
+            location: formData.location,
+            address: formData.address,
+            description: formData.description,
+            maxAudience: formData.maxAudience,
+            organizer: formData.organizer,
+            categories: selectedCategories,
+        })], { type: 'application/json' }));
+
+        // 이미지 파일을 FormData에 추가
+        if (image) {
+            formDataToSend.append('imageFile', image);
+        }
+
         try {
-            await registerPerformanceData({...formData, categories: selectedCategories}); // 공연 등록 함수 호출
+            await registerPerformanceData(formDataToSend); // 공연 등록 함수 호출
             setSnackbarOpen(true); // 알림 켜기
             setTimeout(() => {
                 navigate('/'); // 메인 페이지로 이동
@@ -131,7 +152,8 @@ const PerformanceRegisterPage = () => {
     const handleImageChange = (event) => {
         const file = event.target.files[0];
         if (file) {
-            setImage(URL.createObjectURL(file)); // 미리보기 URL 생성
+            setImage(file); // 파일 객체 저장
+            setPreviewUrl(URL.createObjectURL(file)); // 미리보기 URL 생성
         }
     };
 
@@ -254,12 +276,30 @@ const PerformanceRegisterPage = () => {
                                 포스터 추가
                             </Typography>
                             <UploadBox onClick={triggerFileInput}>
-                                <CloudUploadIcon sx={{ fontSize: 48, color: 'text.secondary' }} />
-                                <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
-                                    이미지를 업로드하세요
-                                </Typography>
-                                {image && <img src={image} alt="uploaded" style={{ marginTop: '10px', maxWidth: '100%', height: 'auto' }} />}
+                                {!previewUrl && ( // previewUrl이 없을 때만 아이콘과 텍스트를 표시
+                                    <>
+                                        <CloudUploadIcon sx={{ fontSize: 48, color: 'text.secondary' }} />
+                                        <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+                                            이미지를 업로드하세요
+                                        </Typography>
+                                    </>
+                                )}
+                                {previewUrl && (
+                                    <img
+                                        src={previewUrl}
+                                        alt="uploaded"
+                                        style={{
+                                            marginTop: '10px',
+                                            maxWidth: '100%',
+                                            maxHeight: '100%',
+                                            objectFit: 'cover', // 박스 영역을 유지하며 이미지를 잘 맞추기 위해 사용
+                                            width: '100%',
+                                            height: '100%',
+                                        }}
+                                    />
+                                )}
                             </UploadBox>
+
                             <input
                                 type="file"
                                 id="fileInput"
@@ -294,8 +334,6 @@ const PerformanceRegisterPage = () => {
                                     );
                                 })}
                             </Box>
-
-
                         </Grid>
                     </Grid>
                     <Button
