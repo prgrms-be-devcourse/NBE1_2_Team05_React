@@ -1,4 +1,3 @@
-/* global daum */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // useNavigate import 추가
 import {
@@ -22,14 +21,6 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import dayjs from 'dayjs';
 import { fetchCategories, registerPerformanceData } from '../../api/performanceApi'; // API 함수 임포트
 
-// 다음 우편번호 API 스크립트 추가
-const loadDaumPostcodeScript = () => {
-    const script = document.createElement('script');
-    script.src = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
-    script.async = true;
-    document.body.appendChild(script);
-};
-
 const UploadBox = styled(Paper)(({ theme }) => ({
     height: '200px',
     display: 'flex',
@@ -41,6 +32,14 @@ const UploadBox = styled(Paper)(({ theme }) => ({
         backgroundColor: theme.palette.action.hover,
     },
 }));
+
+// 다음 우편번호 API 스크립트 추가
+const loadDaumPostcodeScript = () => {
+    const script = document.createElement('script');
+    script.src = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+    script.async = true;
+    document.body.appendChild(script);
+};
 
 const DatePickerField = ({ label, value, onChange }) => (
     <DatePicker
@@ -100,10 +99,10 @@ const PerformanceRegisterPage = () => {
 
     useEffect(() => {
         loadDaumPostcodeScript(); // Daum 우편번호 API 스크립트 로드
-
         const getCategories = async () => {
             try {
-                const data = await fetchCategories(); // 카테고리 데이터 요청
+                const data = await fetchCategories(); // ID로 데이터 요청
+                console.log(data)
                 setCategories(data);
             } catch (err) {
                 setError(err.message);
@@ -111,7 +110,7 @@ const PerformanceRegisterPage = () => {
         };
 
         getCategories();
-    }, []);
+    }, []); // performanceId가 변경될 때마다 데이터 요청
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -152,6 +151,7 @@ const PerformanceRegisterPage = () => {
     const handleImageChange = (event) => {
         const file = event.target.files[0];
         if (file) {
+            // setImage(URL.createObjectURL(file)); // 미리보기 URL 생성
             setImage(file); // 파일 객체 저장
             setPreviewUrl(URL.createObjectURL(file)); // 미리보기 URL 생성
         }
@@ -182,25 +182,16 @@ const PerformanceRegisterPage = () => {
         }
 
         setSelectedCategories(updatedCategories);
+        // 기존 선호 카테고리와 비교하여 변경 사항 있는지 확인
         setHasChanges(!areArraysEqual(favoriteCategories.map(cat => cat.categoryId), updatedCategories));
     };
 
-    // 배열 비교 함수
+    // 배열 비교 함수 (순서와 상관없이 두 배열이 같은지 확인)
     const areArraysEqual = (arr1, arr2) => {
         if (arr1.length !== arr2.length) return false;
         const sortedArr1 = [...arr1].sort();
         const sortedArr2 = [...arr2].sort();
         return sortedArr1.every((value, index) => value === sortedArr2[index]);
-    };
-
-    // 우편번호 찾기 핸들러
-    const handleAddressSearch = () => {
-        new daum.Postcode({
-            oncomplete: function(data) {
-                const fullAddress = data.roadAddress ? data.roadAddress : data.jibunAddress;
-                setFormData({ ...formData, address: fullAddress }); // 세부 주소 필드에 설정
-            }
-        }).open();
     };
 
     return (
@@ -238,8 +229,8 @@ const PerformanceRegisterPage = () => {
                                 value={formData.location}
                                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                             />
-                            <Button variant="text" color="primary" sx={{ mt: 1 }} onClick={handleAddressSearch}>
-                                주소 검색하기
+                            <Button variant="text" color="primary" sx={{ mt: 1 }}>
+                                우편번호 찾기
                             </Button>
                             <TextFieldWithLabel
                                 label="세부 주소"
@@ -292,13 +283,14 @@ const PerformanceRegisterPage = () => {
                                             marginTop: '10px',
                                             maxWidth: '100%',
                                             maxHeight: '100%',
-                                            objectFit: 'cover',
+                                            objectFit: 'cover', // 박스 영역을 유지하며 이미지를 잘 맞추기 위해 사용
                                             width: '100%',
                                             height: '100%',
                                         }}
                                     />
                                 )}
                             </UploadBox>
+
                             <input
                                 type="file"
                                 id="fileInput"
@@ -333,6 +325,8 @@ const PerformanceRegisterPage = () => {
                                     );
                                 })}
                             </Box>
+
+
                         </Grid>
                     </Grid>
                     <Button
