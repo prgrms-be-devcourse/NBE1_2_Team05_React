@@ -96,14 +96,14 @@ const Comment = ({ comment, performanceId, depth = 0, onCommentUpdated, onCommen
 
             // 대댓글이 추가된 댓글을 상위 컴포넌트로 전달
             if (onCommentUpdated) {
-                console.log("Updated comment with reply:", {
+                const updatedComment = {
                     ...comment,
-                    replies: [...comment.replies, newReply] // 기존 대댓글 목록에 새로운 대댓글 추가
-                });
-                onCommentUpdated({
-                    ...comment,
-                    replies: [...comment.replies, newReply]
-                });
+                    replies: [...comment.replies, newReply]  // 기존 대댓글 목록에 새로운 대댓글 추가
+                };
+
+                console.log("Updated comment with new reply:", updatedComment);
+
+                onCommentUpdated(updatedComment);  // 상위 컴포넌트에 전달
             }
         } catch (error) {
             console.error('대댓글 작성 실패:', error);
@@ -172,7 +172,7 @@ const Comment = ({ comment, performanceId, depth = 0, onCommentUpdated, onCommen
             {comment.replies && comment.replies.length > 0 && (
                 comment.replies.map(reply => (
                     <Comment
-                        key={reply.commentId}
+                        key={comment.commentId}  // 고유한 key 추가
                         comment={reply}
                         performanceId={performanceId} // 재귀 호출 시에도 전달
                         depth={depth + 1}
