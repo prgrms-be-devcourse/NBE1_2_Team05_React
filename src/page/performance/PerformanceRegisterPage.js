@@ -103,7 +103,7 @@ const PerformanceRegisterPage = () => {
 
         const getCategories = async () => {
             try {
-                const data = await fetchCategories(); // ID로 데이터 요청
+                const data = await fetchCategories(); // 카테고리 데이터 요청
                 setCategories(data);
             } catch (err) {
                 setError(err.message);
@@ -111,7 +111,7 @@ const PerformanceRegisterPage = () => {
         };
 
         getCategories();
-    }, []); // performanceId가 변경될 때마다 데이터 요청
+    }, []);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -292,14 +292,13 @@ const PerformanceRegisterPage = () => {
                                             marginTop: '10px',
                                             maxWidth: '100%',
                                             maxHeight: '100%',
-                                            objectFit: 'cover', // 박스 영역을 유지하며 이미지를 잘 맞추기 위해 사용
+                                            objectFit: 'cover',
                                             width: '100%',
                                             height: '100%',
                                         }}
                                     />
                                 )}
                             </UploadBox>
-
                             <input
                                 type="file"
                                 id="fileInput"
