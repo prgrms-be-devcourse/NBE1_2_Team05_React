@@ -66,8 +66,9 @@ export default function PerformanceDetailPage() {
   };
 
   const handleImageClick = () => {
-    setSelectedImage('/logo192.png'); // 클릭한 이미지 URL 설정
-    setOpenDialog(true); // Dialog 열기
+      const imageUrl = performanceData?.imageUrl || '/logo192.png'; // performanceData가 존재하면 imageUrl, 없으면 기본 이미지 사용
+      setSelectedImage(imageUrl); // 클릭한 이미지 URL 설정
+      setOpenDialog(true); // Dialog 열기
   };
 
   const handleCloseDialog = () => {
@@ -155,8 +156,8 @@ const handleTicketPurchase = () => {
             </Link>
           </Grid>
           <Grid item md={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <img 
-                src="/logo192.png" 
+              <img
+                src={performanceData?.imageUrl || "/logo192.png"}
                 alt="Performance Image" 
                 style={{ width: '100%', height: '100%', cursor: 'pointer' }} // 커서 포인터 추가
                 onClick={handleImageClick} // 클릭 핸들러 추가
