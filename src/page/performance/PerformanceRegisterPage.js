@@ -33,6 +33,14 @@ const UploadBox = styled(Paper)(({ theme }) => ({
     },
 }));
 
+// 다음 우편번호 API 스크립트 추가
+const loadDaumPostcodeScript = () => {
+    const script = document.createElement('script');
+    script.src = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+    script.async = true;
+    document.body.appendChild(script);
+};
+
 const DatePickerField = ({ label, value, onChange }) => (
     <DatePicker
         label={label}
@@ -90,6 +98,7 @@ const PerformanceRegisterPage = () => {
     const navigate = useNavigate(); // useNavigate 훅 사용
 
     useEffect(() => {
+        loadDaumPostcodeScript(); // Daum 우편번호 API 스크립트 로드
         const getCategories = async () => {
             try {
                 const data = await fetchCategories(); // ID로 데이터 요청
