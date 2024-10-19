@@ -19,6 +19,7 @@ import {
   Dialog,
   DialogContent
 } from '@mui/material';
+import KakaoMap from "../../component/performance/KakaoMap";
 
 export default function PerformanceDetailPage() {
   const { performanceId } = useParams(); // URL에서 performanceId 가져오기
@@ -211,7 +212,9 @@ const handleTicketPurchase = () => {
           </Grid>
           <Grid item xs={15} sm={5}>
             <Typography variant="subtitle1">장소</Typography>
-            <Typography>{performanceData.address}</Typography>
+              <Typography>{performanceData.address}</Typography>
+            <KakaoMap address={performanceData.address} /> {/* KakaoMap 컴포넌트 사용 */}
+
           </Grid>
           <Grid item xs={5} sm={2}>
             <Typography variant="subtitle1">가격</Typography>

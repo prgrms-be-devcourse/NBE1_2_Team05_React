@@ -73,13 +73,28 @@ const CommentList = ({ performanceId }) => {
                     comment={comment}
                     performanceId={performanceId}
                     onCommentUpdated={(updatedComment) => {
+                        console.log("Updating comment list with new reply:", updatedComment); // 상태 업데이트 로그
                         setComments((prevComments) =>
                             prevComments.map((c) =>
                                 c.commentId === updatedComment.commentId ? updatedComment : c
                             )
                         );
                     }}
+
+                    onCommentDeleted={(deletedCommentId) => {
+                        console.log("Updating state for deleted comment:", deletedCommentId);  // 삭제된 댓글 ID 로그 출력
+
+                        // 댓글 상태를 'DELETED'로 업데이트
+                        setComments((prevComments) =>
+                            prevComments.map((c) =>
+                                c.commentId === deletedCommentId ? { ...c, commentStatus: 'DELETED' } : c
+                            )
+                        );
+
+                        console.log("Updated comments state after deletion:", comments);  // 상태 업데이트 후 로그
+                    }}
                 />
+
             ))}
 
 
