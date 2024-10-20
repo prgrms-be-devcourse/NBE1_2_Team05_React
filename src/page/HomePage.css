@@ -1,43 +1,120 @@
-/* 검색창 스타일 */
-.search-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
+.custom-page {
+    padding: 20px;
+    max-width: 1200px; /* 화면의 최대 너비를 설정 */
+    margin: 0 auto; /* 양옆 여백을 주기 위해 가운데 정렬 */
 }
 
-
-/* 카테고리 버튼 스타일 */
-.category {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap; /* 여러 줄로 나올 경우 자동 줄바꿈 */
-    gap: 10px;
-    margin-bottom: 10px;
+.section {
+    margin-bottom: 60px; /* 각 섹션에 더 넓은 마진 */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* 연한 구분선 */
+    padding-bottom: 40px;
 }
 
-.category button {
-    border-radius: 30px; /* 버튼 둥글게 */
-    padding: 10px 20px;
+h2 {
+    font-size: 35px; /* 타이틀 크기 조정 */
+    margin-left: 20px; /* 왼쪽 마진 추가 */
+    font-weight: bold;
 }
 
-/* 공연 추가 버튼 */
-.add-performance-btn {
-    position: fixed;
-    bottom: 40px;
-    right: 40px;
-    background-color: #007bff;
-    color: white;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
+.scrollable-row-container {
+    position: relative;
     display: flex;
-    justify-content: center;
     align-items: center;
-    font-size: 24px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s ease;
 }
 
-.add-performance-btn:hover {
-    background-color: #0056b3;
+.scrollable-row {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding-bottom: 20px;
+    scroll-behavior: smooth; /* 스크롤 부드럽게 */
+    padding-left: 0; /* 첫 번째 카드가 딱 붙도록 */
 }
+
+.scrollable-row::-webkit-scrollbar {
+    display: none; /* 스크롤바 숨김 */
+}
+
+.scroll-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 60px; /* 화살표 크기 */
+    color: #666; /* 화살표 색상 */
+    opacity: 0.8; /* 살짝 투명하게 */
+    z-index: 1;
+    pointer-events: none; /* 클릭할 수 없도록 설정 */
+}
+
+.scroll-arrow.left {
+    left: -50px; /* 가로 스크롤 바깥으로 화살표 이동 */
+}
+
+.scroll-arrow.right {
+    right: -60px; /* 가로 스크롤 바깥으로 화살표 이동 */
+}
+
+.performance-with-ranking {
+    position: relative;
+    display: flex;
+    align-items: center; /* 세로 정렬 */
+}
+
+.ranking {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    font-size: 60px; /* 크기 조정 */
+    font-style: italic; /* 이탤릭체 적용 */
+    color: white; /* 숫자 색상 */
+    font-weight: bold;
+    text-shadow:
+            -1px -1px 0 #000,  /* 왼쪽 위 */
+            1px -1px 0 #000,   /* 오른쪽 위 */
+            -1px 1px 0 #000,   /* 왼쪽 아래 */
+            1px 1px 0 #000;    /* 오른쪽 아래 */
+}
+
+.infinite-scroll {
+    display: flex;
+    gap: 20px;
+    animation: scroll-left 40s linear infinite; /* 속도 조정 및 자연스러운 스크롤 */
+}
+
+@keyframes scroll-left {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between; /* 헤더 내에서 h2는 왼쪽, 버튼은 오른쪽에 배치 */
+    align-items: center;
+    margin-top: -10px;
+}
+
+/* 추가된 전체보기 버튼 스타일 */
+.view-all-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 18px;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.view-all-button:hover {
+    background-color: #f1f1f1;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+

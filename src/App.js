@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
-import HomePage from './page/HomePage';
+import AllPerformancePage from './page/AllPerformancePage';
 import SigninPage from './page/member/SigninPage';
 import SignupPage from './page/member/SignupPage';
 import PerformanceRegisterPage from './page/performance/PerformanceRegisterPage';
@@ -18,6 +18,7 @@ import TicketPaymentPage from "./page/ticket/TicketPaymentPage";
 import CommentTestPage from "./page/CommentTestPage";
 import { useParams } from 'react-router-dom';
 import MemberRoleChangePage from "./page/member/MemberRoleChangePage";
+import HomePage from "./page/HomePage";
 
 
 
@@ -34,7 +35,7 @@ function Layout() {
             {!noHeaderRoutes.includes(location.pathname) && <Header />}
 
             <Routes>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/all" element={<AllPerformancePage />} />
                 <Route path="/signin" element={<SigninPage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/nickname" element={<NicknamePage />} />
@@ -44,6 +45,7 @@ function Layout() {
                 <Route path="/kakao-callback" element={<KakaoCallback />} />
                 <Route path="/naver-callback" element={<NaverCallBack />} />
                 <Route path="/member/role" element={<MemberRoleChangePage />} />
+                <Route path="/" element={<HomePage />} />
 
 
                 {/* 로그인 여부에 따라 페이지 접근 제한 */}
