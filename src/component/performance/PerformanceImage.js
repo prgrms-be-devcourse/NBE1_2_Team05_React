@@ -22,7 +22,7 @@ export function PerformanceImage({ imageUrl }) {
                 style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
+                    objectFit: 'contain', // 이미지 전체를 보여주기 위해 contain 사용
                 }}
             />
         </Box>

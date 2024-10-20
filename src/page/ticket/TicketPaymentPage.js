@@ -1,21 +1,23 @@
-// 티켓 결제 페이지
-// author : ycjung
-
 import React, {useEffect, useState} from 'react';
 import { useLocation } from 'react-router-dom'; // useLocation 추가
 import {
     Box,
     Container,
     Divider,
-    FormControl,
     Grid,
     IconButton,
-    InputLabel,
     MenuItem,
     Paper,
     Select,
     TextField,
-    Typography
+    Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableRow,
+    FormControl,
+    InputLabel
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -24,12 +26,10 @@ import {PerformanceImage} from "../../component/performance/PerformanceImage";
 import {PerformanceInfo} from "../../component/performance/PerformanceInfo";
 import {getAllCouponsByMemberEmail} from "../../api/couponApi";
 
+// PeopleCounter 컴포넌트 수정
 function PeopleCounter({ numPeople, handleDecrease, handleIncrease, handleInputChange }) {
     return (
-        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
-            <Typography variant="body1" sx={{ marginRight: 2 }}>
-                인원:
-            </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 2, minWidth: 150 }}>
             <IconButton onClick={handleDecrease} aria-label="감소">
                 <RemoveIcon />
             </IconButton>
@@ -46,12 +46,10 @@ function PeopleCounter({ numPeople, handleDecrease, handleIncrease, handleInputC
         </Box>
     );
 }
-
 // 쿠폰 데이터를 가져오는 함수
 const fetchCoupons = async () => {
     try {
         const couponData = await getAllCouponsByMemberEmail();
-        console.log(couponData)
         return couponData;  // 쿠폰 데이터를 반환
     } catch (error) {
         console.error('Failed to fetch coupons:', error);
@@ -59,11 +57,10 @@ const fetchCoupons = async () => {
     }
 };
 
-// 쿠폰 선택 컴포넌트
+// CouponSelector 컴포넌트 수정
 function CouponSelector({ selectedCoupon, setSelectedCoupon, setSelectedCouponPercent }) {
     const [coupons, setCoupons] = useState([]);
 
-    // 쿠폰 데이터를 가져오는 useEffect
     useEffect(() => {
         const loadCoupons = async () => {
             try {
@@ -71,43 +68,42 @@ function CouponSelector({ selectedCoupon, setSelectedCoupon, setSelectedCouponPe
                 const noCouponOption = { couponId: -1, name: '선택 안함', percent: 0 };
 
                 if (couponData.length === 0) {
-                    setCoupons([noCouponOption]);  // 쿠폰이 없을 때 '선택 안함'만 표시
+                    setCoupons([noCouponOption]);
                     setSelectedCoupon(noCouponOption.couponId);
                     setSelectedCouponPercent(0);
                 } else {
-                    setCoupons([noCouponOption, ...couponData]);  // '선택 안함' + 쿠폰 리스트
-                    setSelectedCoupon(noCouponOption.couponId);  // 기본적으로 '선택 안함' 선택
+                    setCoupons([noCouponOption, ...couponData]);
+                    setSelectedCoupon(noCouponOption.couponId);
                     setSelectedCouponPercent(0);
                 }
             } catch (error) {
                 console.error('Failed to fetch coupons:', error);
                 const defaultCoupon = { couponId: -1, name: '쿠폰 없음', percent: 0 };
                 setCoupons([defaultCoupon]);
-                setSelectedCoupon(defaultCoupon.couponId); // 에러 시 '쿠폰 없음' 선택
-                setSelectedCouponPercent(0); // 에러 시 할인율 0으로 설정
+                setSelectedCoupon(defaultCoupon.couponId);
+                setSelectedCouponPercent(0);
             }
         };
 
         loadCoupons();
     }, [setSelectedCoupon, setSelectedCouponPercent]);
 
-    // 쿠폰 선택 변경 핸들러
     const handleCouponChange = (event) => {
         const selectedCouponId = event.target.value;
         const coupon = coupons.find(coupon => coupon.couponId === selectedCouponId);
         setSelectedCoupon(selectedCouponId);
-        setSelectedCouponPercent(coupon.percent); // 선택된 쿠폰의 percent 값 설정
+        setSelectedCouponPercent(coupon.percent);
     };
 
     return (
-        <FormControl fullWidth sx={{ marginTop: 2 }} variant="outlined">
+        <FormControl fullWidth variant="outlined" sx={{ minWidth: 150 }}>
             <InputLabel id="coupon-select-label">보유한 할인 쿠폰 선택</InputLabel>
             <Select
                 labelId="coupon-select-label"
                 id="coupon-select"
                 value={selectedCoupon}
                 onChange={handleCouponChange}
-                label="보유한 할인 쿠폰 선택"  // Select에 label 속성 추가
+                label="보유한 할인 쿠폰 선택"
             >
                 {coupons.map((coupon) => (
                     <MenuItem key={coupon.couponId} value={coupon.couponId}>
@@ -119,17 +115,44 @@ function CouponSelector({ selectedCoupon, setSelectedCoupon, setSelectedCouponPe
     );
 }
 
-// 결제 정보 컴포넌트
-function PaymentInfo({ numPeople, performancePrice }) {
+// PaymentInfo 컴포넌트에서 TableCell 수정
+function PaymentInfo({ numPeople, performancePrice, totalPayment, selectedCoupon, setSelectedCoupon, setSelectedCouponPercent, handleDecrease, handleIncrease, handleInputChange }) {
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
-            <WidgetCheckoutPage />
-        </Box>
+        <TableContainer component={Paper} sx={{ marginTop: 4 }}>
+            <Table>
+                <TableBody>
+                    <TableRow>
+                        <TableCell>공연 금액</TableCell>
+                        <TableCell align="right" sx={{ width: '150px' }}>{performancePrice.toLocaleString()}원</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>인원 선택</TableCell>
+                        <TableCell align="right" sx={{ width: '150px' }}>
+                            <PeopleCounter
+                                numPeople={numPeople}
+                                handleDecrease={handleDecrease}
+                                handleIncrease={handleIncrease}
+                                handleInputChange={handleInputChange}
+                            />
+                        </TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>할인 쿠폰</TableCell>
+                        <TableCell align="right" sx={{ width: '150px' }}>
+                            <CouponSelector
+                                selectedCoupon={selectedCoupon}
+                                setSelectedCoupon={setSelectedCoupon}
+                                setSelectedCouponPercent={setSelectedCouponPercent}
+                            />
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+        </TableContainer>
     );
 }
 
 export default function TicketPaymentPage() {
-
     const location = useLocation(); // location 훅 사용
     const {
         imageUrl = "https://via.placeholder.com/300x200",
@@ -137,8 +160,8 @@ export default function TicketPaymentPage() {
         time = "0000년도 00월 00일 00시 00분",
         performancePrice = 50000,
         remainingTickets = 10,
-    } = location.state || {}; // 전달된 데이터를 location.state에서 받아옴              
-    
+    } = location.state || {}; // 전달된 데이터를 location.state에서 받아옴
+
     const [numPeople, setNumPeople] = useState(1); // 기본 인원 수 1명
     const [selectedCoupon, setSelectedCoupon] = useState(''); // 선택된 쿠폰 상태
     const [selectedCouponPercent, setSelectedCouponPercent] = useState(0); // 선택된 쿠폰의 percent (할인율)
@@ -184,24 +207,18 @@ export default function TicketPaymentPage() {
                             remainingTickets={remainingTickets}
                         />
 
-                        <PeopleCounter
+                        {/* 테이블로 정리된 결제 정보 */}
+                        <PaymentInfo
                             numPeople={numPeople}
+                            performancePrice={performancePrice}
+                            totalPayment={calculateTotalPrice()}
+                            selectedCoupon={selectedCoupon}
+                            setSelectedCoupon={setSelectedCoupon}
+                            setSelectedCouponPercent={setSelectedCouponPercent}
                             handleDecrease={handleDecrease}
                             handleIncrease={handleIncrease}
                             handleInputChange={handleInputChange}
                         />
-
-                        {/* 쿠폰 선택 컴포넌트 */}
-                        <CouponSelector
-                            selectedCoupon={selectedCoupon}
-                            setSelectedCoupon={setSelectedCoupon}
-                            setSelectedCouponPercent={setSelectedCouponPercent}
-                        />
-
-                        {/* 총 결제 금액 = 공연 금액 * 인원 수 - 할인 적용 계산 */}
-                        <Typography variant="h6" gutterBottom>
-                            총 결제 금액: {calculateTotalPrice()}원
-                        </Typography>
                     </Grid>
 
                     {/* 구분선 */}
@@ -211,7 +228,7 @@ export default function TicketPaymentPage() {
 
                     {/* 오른쪽: 결제 정보 섹션 */}
                     <Grid item xs={12} md={6}>
-                        <PaymentInfo numPeople={numPeople} performancePrice={performancePrice} />
+                        <WidgetCheckoutPage totalPayment={calculateTotalPrice()} />
                     </Grid>
                 </Grid>
             </Paper>

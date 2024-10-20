@@ -18,6 +18,8 @@ import TicketPaymentPage from "./page/ticket/TicketPaymentPage";
 import CommentTestPage from "./page/CommentTestPage";
 import { useParams } from 'react-router-dom';
 import MemberRoleChangePage from "./page/member/MemberRoleChangePage";
+import {WidgetSuccessPage} from "./component/ticket/payment/WidgetSuccess";
+import {FailPage} from "./component/ticket/payment/Fail";
 
 
 
@@ -44,6 +46,10 @@ function Layout() {
                 <Route path="/kakao-callback" element={<KakaoCallback />} />
                 <Route path="/naver-callback" element={<NaverCallBack />} />
                 <Route path="/member/role" element={<MemberRoleChangePage />} />
+
+                {/*결제 리다이랙트 페이지*/}
+                <Route path="/widget/success" element={<WidgetSuccessPage />} />
+                <Route path="/fail" element={<FailPage />} />
 
 
                 {/* 로그인 여부에 따라 페이지 접근 제한 */}
