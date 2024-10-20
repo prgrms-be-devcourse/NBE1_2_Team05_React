@@ -232,6 +232,7 @@ export default function TicketPaymentPage() {
                         <WidgetCheckoutPage
                             performanceId={performanceId}
                             couponId={selectedCoupon}
+                            quantity={numPeople}
                             totalPayment={calculateTotalPrice()} />
                     </Grid>
                 </Grid>

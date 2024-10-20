@@ -9,7 +9,7 @@ const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 const customerKey = generateRandomString();
 
 export function WidgetCheckoutPage(
-    { performanceId, couponId, totalPayment }) {
+    { performanceId, couponId, quantity, totalPayment }) {
   const navigate = useNavigate();
   const { userName } = useAuth();
 
@@ -105,6 +105,7 @@ export function WidgetCheckoutPage(
 
                   console.log("performanceId : " + performanceId)
                   console.log("couponId : " + couponId)
+                  console.log("quantity : " + quantity)
 
                   await widgets.requestPayment({
                     orderId: generateRandomString(),
@@ -117,7 +118,7 @@ export function WidgetCheckoutPage(
                     metadata: {
                       performanceId: performanceId, // 공연 ID 값
                       couponId: couponId, // 좌석 정보
-                      test: "testttt",
+                      quantity: quantity,
                     },
                   });
 
