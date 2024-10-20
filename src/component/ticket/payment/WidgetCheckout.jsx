@@ -8,7 +8,8 @@ import { useAuth } from "../../../context/AuthContext";
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 const customerKey = generateRandomString();
 
-export function WidgetCheckoutPage({ totalPayment }) {
+export function WidgetCheckoutPage(
+    { performanceId, couponId, totalPayment }) {
   const navigate = useNavigate();
   const { userName } = useAuth();
 
@@ -111,8 +112,8 @@ export function WidgetCheckoutPage({ totalPayment }) {
                     // customerName: "김토스",
                     // customerMobilePhone: "01012341234",
                     metadata: {
-                      performanceId: "VIP", // 예매 티켓 유형 (VIP, 일반 등)
-                      couponId: "A12", // 좌석 정보
+                      performanceId: performanceId, // 공연 ID 값
+                      couponId: couponId, // 좌석 정보
                     },
                   });
 

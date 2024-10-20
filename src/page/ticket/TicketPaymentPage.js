@@ -155,6 +155,7 @@ function PaymentInfo({ numPeople, performancePrice, totalPayment, selectedCoupon
 export default function TicketPaymentPage() {
     const location = useLocation(); // location 훅 사용
     const {
+        performanceId,
         imageUrl = "https://via.placeholder.com/300x200",
         title = "공연 제목",
         time = "0000년도 00월 00일 00시 00분",
@@ -228,7 +229,10 @@ export default function TicketPaymentPage() {
 
                     {/* 오른쪽: 결제 정보 섹션 */}
                     <Grid item xs={12} md={6}>
-                        <WidgetCheckoutPage totalPayment={calculateTotalPrice()} />
+                        <WidgetCheckoutPage
+                            performanceId={performanceId}
+                            couponId={selectedCoupon}
+                            totalPayment={calculateTotalPrice()} />
                     </Grid>
                 </Grid>
             </Paper>
