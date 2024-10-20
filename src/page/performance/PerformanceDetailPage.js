@@ -98,7 +98,7 @@ export default function PerformanceDetailPage() {
 const handleTicketPurchase = () => {
     navigate(`/payment`, {
         state: {
-            performanceId: performanceData.id,
+            performanceId: performanceId,
             imageUrl: performanceData.imageUrl || "https://via.placeholder.com/300x200", // 이미지 URL
             title: performanceData.title, // 공연 제목
             time: `${performanceData.startDateTime} ~ ${performanceData.endDateTime}`, // 공연 시간

@@ -34,7 +34,10 @@ export function WidgetSuccessPage() {
         console.log("결제 내역:", data);
 
         if (data.metadata) {
-          console.log("Metadata:", data.metadata);
+          console.log("Metadata received:", data.metadata);
+          if (!data.metadata.performanceId) {
+            console.error("Performance ID is missing in the metadata");
+          }
         }
 
       } catch (error) {

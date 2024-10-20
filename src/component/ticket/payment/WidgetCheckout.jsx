@@ -103,6 +103,9 @@ export function WidgetCheckoutPage(
                     value: totalPayment, // 최신 totalPayment 값으로 결제 설정
                   });
 
+                  console.log("performanceId : " + performanceId)
+                  console.log("couponId : " + couponId)
+
                   await widgets.requestPayment({
                     orderId: generateRandomString(),
                     orderName: "공연 티켓 결제",
@@ -114,6 +117,7 @@ export function WidgetCheckoutPage(
                     metadata: {
                       performanceId: performanceId, // 공연 ID 값
                       couponId: couponId, // 좌석 정보
+                      test: "testttt",
                     },
                   });
 
