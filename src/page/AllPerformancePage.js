@@ -45,6 +45,7 @@ const AllPerformancePage = () => {
                     endDateTime: item.dateEndTime,
                     price: item.price,
                     address: item.address,
+                    remainingTicket: item.remainingTicket,
                 }));
 
                 setTotalItems(totalElements);

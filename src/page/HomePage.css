@@ -94,7 +94,7 @@ h2 {
     display: flex;
     justify-content: space-between; /* 헤더 내에서 h2는 왼쪽, 버튼은 오른쪽에 배치 */
     align-items: center;
-    margin-top: -10px;
+    margin-top: -25px;
 }
 
 /* 추가된 전체보기 버튼 스타일 */

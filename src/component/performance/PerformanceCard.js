@@ -5,7 +5,7 @@ import { format, parseISO } from 'date-fns';
 import { FiCalendar, FiMapPin } from 'react-icons/fi'; // 달력, 핀 아이콘 사용
 import { GiTwoCoins } from 'react-icons/gi'; // 동전 모양 아이콘 사용
 
-const PerformanceCard = ({ performanceId, imageUrl, title, startDateTime, endDateTime, price, address }) => {
+const PerformanceCard = ({ performanceId, imageUrl, title, startDateTime, endDateTime, price, address, remainingTicket }) => {
     const defaultImageUrl = '/logo192.png'; // public 폴더에 있는 기본 이미지
 
     // 날짜 포맷팅 함수
@@ -24,9 +24,9 @@ const PerformanceCard = ({ performanceId, imageUrl, title, startDateTime, endDat
         <div>
             <Link to={`/performance/${performanceId}`} style={{ textDecoration: 'none', color: 'inherit'}}>
                 <div className="performance-card">
-                        <div className="image-container">
-                            <img src={imageUrl || defaultImageUrl} alt="Performance" className="performance-image" />
-                        </div>
+                    <div className="image-container">
+                        <img src={imageUrl || defaultImageUrl} alt="Performance" className="performance-image" />
+                    </div>
                     <h2 className="title">{title}</h2>
 
                     <div className="info-container">
@@ -39,10 +39,21 @@ const PerformanceCard = ({ performanceId, imageUrl, title, startDateTime, endDat
                             <span className="address">{formatAddress(address)}</span>
                         </div>
                         <div className="price-container">
-                            <GiTwoCoins className="price-icon" /> {/* 동전 모양 아이콘 */}
-                            <span className="price">
-                                {price > 0 ? `${price.toLocaleString()}원` : '무료'}
-                            </span>
+                            <div>
+                                <GiTwoCoins className="price-icon" /> {/* 동전 모양 아이콘 */}
+                                <span className="price">
+                                    {price > 0 ? `${price.toLocaleString()}원` : '무료'}
+                                </span>
+                            </div>
+                            <div>
+                            {/* remainingTicket에 따라 마감 상태를 블럭으로 표시 */}
+                            {remainingTicket <= 10 && remainingTicket > 0 && (
+                                <div className="status-block warning">마감임박</div>  // 마감 임박 블럭
+                            )}
+                            {remainingTicket === 0 && (
+                                <div className="status-block closed">마감</div>  // 마감 블럭
+                            )}
+                        </div>
                         </div>
                     </div>
                 </div>

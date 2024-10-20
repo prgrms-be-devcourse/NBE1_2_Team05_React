@@ -53,6 +53,7 @@ const HomePage = () => {
                     endDateTime: item.dateEndTime,
                     price: item.price,
                     address: item.address,
+                    remainingTicket: item.remainingTicket,
                 }));
                 setPerformances(processedPerformances);
             } else {
@@ -81,6 +82,7 @@ const HomePage = () => {
                     endDateTime: item.dateEndTime,
                     price: item.price,
                     address: item.address,
+                    remainingTicket: item.remainingTicket,
                 }));
                 setFavoritePerformances(processedFavorites);
             } else {
