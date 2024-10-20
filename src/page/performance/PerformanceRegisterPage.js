@@ -294,10 +294,11 @@ const PerformanceRegisterPage = () => {
                             <input
                                 type="file"
                                 id="fileInput"
-                                accept="image/*"
+                                accept=".jpg,.jpeg,.png,.gif,.bmp"
                                 onChange={handleImageChange}
                                 style={{ display: 'none' }}
                             />
+
                             <Button fullWidth variant="contained" color="secondary" sx={{ mt: 2, mb: 5 }} onClick={triggerFileInput}>
                                 추가 버튼
                             </Button>
