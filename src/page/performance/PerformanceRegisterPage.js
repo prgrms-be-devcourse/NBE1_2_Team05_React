@@ -148,6 +148,33 @@ const PerformanceRegisterPage = () => {
         }
     };
 
+    // 우편번호 검색 핸들러 함수
+    const handleAddressSearch = () => {
+        new window.daum.Postcode({
+            oncomplete: (data) => {
+                let fullAddress = data.address;
+                let extraAddress = '';
+
+                if (data.addressType === 'R') {
+                    if (data.bname !== '') {
+                        extraAddress += data.bname;
+                    }
+                    if (data.buildingName !== '') {
+                        extraAddress += (extraAddress !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    fullAddress += (extraAddress !== '' ? ' (' + extraAddress + ')' : '');
+                }
+
+                // 검색된 주소를 폼 데이터에 반영
+                setFormData(prevFormData => ({
+                    ...prevFormData,
+                    address: fullAddress
+                }));
+            }
+        }).open();
+    };
+
+
     const handleImageChange = (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -229,8 +256,8 @@ const PerformanceRegisterPage = () => {
                                 value={formData.location}
                                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                             />
-                            <Button variant="text" color="primary" sx={{ mt: 1 }}>
-                                우편번호 찾기
+                            <Button variant="text" color="primary" sx={{ mt: 1 }} onClick={handleAddressSearch}>
+                                주소 검색하기
                             </Button>
                             <TextFieldWithLabel
                                 label="세부 주소"
