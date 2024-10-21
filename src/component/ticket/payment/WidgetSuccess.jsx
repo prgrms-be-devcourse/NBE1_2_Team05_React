@@ -33,29 +33,25 @@ export function WidgetSuccessPage() {
         const data = await response.json();
         console.log("결제 내역:", data);
 
-        if (data.metadata) {
-          console.log("Metadata received:", data.metadata);
-          if (!data.metadata.performanceId) {
-            console.error("Performance ID is missing in the metadata");
-          }
-        }
+        // Metadata에서 필요한 값 추출
+        const { performanceId, quantity, couponId } = data.metadata;
+
+
+        // ticketRequestDto 설정
+        const ticketRequestDto = {
+          performanceId: performanceId, // 공연 ID
+          quantity: quantity, // 예매 인원
+          couponId: couponId >= 1 ? couponId : null // 쿠폰 ID가 1 이상일 경우에만 사용
+        };
+
+        // 결제 확인 후 티켓 발권
+        const ticketResponse = await buyTicket(ticketRequestDto);
+        setResponseData(ticketResponse);
 
       } catch (error) {
         console.error("Error in confirm function:", error);
         throw error;
       }
-
-
-      // 결제 확인 후 티켓 구매 요청
-      // const ticketRequestDto = {
-      //   performanceId: searchParams.get("performanceId"), // 공연 ID는 추가 파라미터로 받아올 수 있음
-      //   quantity: 1, // 예매 인원 (예시)
-      //   couponId: null // 쿠폰 ID (선택 사항)
-      // };
-      //
-      // const ticketResponse = await buyTicket(ticketRequestDto); // 티켓 발권 API 호출
-      // setResponseData(ticketResponse);
-
     }
 
     confirm()
