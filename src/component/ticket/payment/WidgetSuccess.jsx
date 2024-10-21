@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {buyTicket} from "../../../api/ticketApi";
 
 export function WidgetSuccessPage() {
   const navigate = useNavigate();
@@ -14,30 +15,54 @@ export function WidgetSuccessPage() {
         paymentKey: searchParams.get("paymentKey"),
       };
 
-      const response = await fetch("/api/confirm/widget", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      });
+      try {
+        // 시크릿 키를 Base64로 인코딩 (btoa 함수 사용)
+        const secretKey = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm'; // 시크릿 키
+        const encodedKey = btoa(`${secretKey}:`); // Base64 인코딩
 
-      const json = await response.json();
+        // Toss Payments API로 결제 정보 요청 (paymentKey 사용)
+        const response = await fetch(`https://api.tosspayments.com/v1/payments/${requestData.paymentKey}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Basic ${encodedKey}`, // 인코딩된 시크릿 키 사용
+            'Content-Type': 'application/json',
+          },
+        });
 
-      if (!response.ok) {
-        throw { message: json.message, code: json.code };
+        // JSON 응답 파싱
+        const data = await response.json();
+        console.log("결제 내역:", data);
+
+        // Metadata에서 필요한 값 추출
+        const { performanceId, quantity, couponId } = data.metadata;
+
+
+        // ticketRequestDto 설정
+        const ticketRequestDto = {
+          performanceId: performanceId, // 공연 ID
+          quantity: quantity, // 예매 인원
+          couponId: couponId >= 1 ? couponId : null // 쿠폰 ID가 1 이상일 경우에만 사용
+        };
+
+        // 결제 확인 후 티켓 발권
+        const ticketResponse = await buyTicket(ticketRequestDto);
+        setResponseData(ticketResponse);
+
+      } catch (error) {
+        console.error("Error in confirm function:", error);
+        throw error;
       }
-
-      return json;
     }
 
     confirm()
-      .then((data) => {
-        setResponseData(data);
-      })
-      .catch((error) => {
-        navigate(`/fail?code=${error.code}&message=${error.message}`);
-      });
+        .then((data) => {
+          // setResponseData(data);
+          console.log("결제 및 티켓 발권 성공:", data);
+        })
+        .catch((error) => {
+          console.error("Error in catch block:", error); // 에러 디버깅
+          navigate(`/fail?code=${error.code}&message=${error.message}`);
+        });
   }, [searchParams]);
 
   return (
