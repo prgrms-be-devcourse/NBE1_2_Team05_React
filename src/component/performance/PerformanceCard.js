@@ -1,12 +1,23 @@
 import React from 'react';
-import './PerformanceCard.css'; // CSS 파일을 import합니다.
-import { Link } from 'react-router-dom'; // Link 임포트
+import './PerformanceCard.css';
+import { Link } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
-import { FiCalendar, FiMapPin } from 'react-icons/fi'; // 달력, 핀 아이콘 사용
-import { GiTwoCoins } from 'react-icons/gi'; // 동전 모양 아이콘 사용
+import { FiCalendar, FiMapPin } from 'react-icons/fi';
+import { GiTwoCoins } from 'react-icons/gi';
 
-const PerformanceCard = ({ performanceId, imageUrl, title, startDateTime, endDateTime, price, address }) => {
-    const defaultImageUrl = '/logo192.png'; // public 폴더에 있는 기본 이미지
+const PerformanceCard = ({
+                             performanceId,
+                             imageUrl,
+                             title,
+                             startDateTime,
+                             endDateTime,
+                             price,
+                             address,
+                             remainingTicket,
+                             onClick,
+                             isDragging,
+                         }) => {
+    const defaultImageUrl = '/logo192.png';
 
     // 날짜 포맷팅 함수
     const formatDate = (dateString) => {
@@ -22,27 +33,55 @@ const PerformanceCard = ({ performanceId, imageUrl, title, startDateTime, endDat
 
     return (
         <div>
-            <Link to={`/performance/${performanceId}`} style={{ textDecoration: 'none', color: 'inherit'}}>
+            <Link
+                to={isDragging ? '#' : `/performance/${performanceId}`} // 드래그 중이면 링크 비활성화
+                onClick={(e) => {
+                    if (isDragging) {
+                        e.preventDefault();
+                        e.stopPropagation(); // 이벤트 전파 방지
+                    } else if (onClick) {
+                        onClick(e);
+                    }
+                }}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+            >
                 <div className="performance-card">
-                        <div className="image-container">
-                            <img src={imageUrl || defaultImageUrl} alt="Performance" className="performance-image" />
-                        </div>
+                    <div className="image-container">
+                        <img
+                            src={imageUrl || defaultImageUrl}
+                            alt="Performance"
+                            className="performance-image"
+                        />
+                    </div>
                     <h2 className="title">{title}</h2>
 
                     <div className="info-container">
                         <div className="date-container">
-                            <FiCalendar className="calendar-icon" /> {/* 달력 아이콘 */}
-                            <span className="date">{`${formatDate(startDateTime)} ~ ${formatDate(endDateTime)}`}</span>
+                            <FiCalendar className="calendar-icon" />
+                            <span className="date">{`${formatDate(
+                                startDateTime
+                            )} ~ ${formatDate(endDateTime)}`}</span>
                         </div>
                         <div className="address-container">
-                            <FiMapPin className="address-icon" /> {/* 핀 아이콘 */}
+                            <FiMapPin className="address-icon" />
                             <span className="address">{formatAddress(address)}</span>
                         </div>
                         <div className="price-container">
-                            <GiTwoCoins className="price-icon" /> {/* 동전 모양 아이콘 */}
-                            <span className="price">
-                                {price > 0 ? `${price.toLocaleString()}원` : '무료'}
-                            </span>
+                            <div>
+                                <GiTwoCoins className="price-icon" />
+                                <span className="price">
+                                    {price > 0 ? `${price.toLocaleString()}원` : '무료'}
+                                </span>
+                            </div>
+                            <div>
+                                {/* remainingTicket에 따라 마감 상태를 블럭으로 표시 */}
+                                {remainingTicket <= 10 && remainingTicket > 0 && (
+                                    <div className="status-block warning">마감임박</div>
+                                )}
+                                {remainingTicket === 0 && (
+                                    <div className="status-block closed">마감</div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -138,3 +138,17 @@ export const fetchCategoryData = async () => {
         throw new Error(err.message);
     }
 };
+
+
+// 사용자 선호 카테고리 기반 추천 공연 조회
+export const fetchFavoritePerformances = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/performances/favorites`);
+        return {
+            totalElements: response.data.result.totalElements,
+            performances: response.data.result.performanceList || [],
+        };
+    } catch (err) {
+        throw new Error(err.message);
+    }
+};
