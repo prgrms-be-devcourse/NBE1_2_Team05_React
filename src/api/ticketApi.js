@@ -33,3 +33,12 @@ export const deleteTicket = async (ticketId) => {
     }
 };
 
+// 티켓 발권 (구매)
+export const buyTicket = async (ticketRequestDto) => {
+    try {
+        const response = await axios.post(API_URL, ticketRequestDto); // 티켓 구매 정보 전송
+        return response.data; // 구매된 티켓 정보 반환
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};

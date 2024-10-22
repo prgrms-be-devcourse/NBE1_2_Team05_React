@@ -19,6 +19,7 @@ import {
   Dialog,
   DialogContent
 } from '@mui/material';
+import KakaoMap from "../../component/performance/KakaoMap";
 
 export default function PerformanceDetailPage() {
   const { performanceId } = useParams(); // URL에서 performanceId 가져오기
@@ -66,8 +67,9 @@ export default function PerformanceDetailPage() {
   };
 
   const handleImageClick = () => {
-    setSelectedImage('/logo192.png'); // 클릭한 이미지 URL 설정
-    setOpenDialog(true); // Dialog 열기
+      const imageUrl = performanceData?.imageUrl || '/logo192.png'; // performanceData가 존재하면 imageUrl, 없으면 기본 이미지 사용
+      setSelectedImage(imageUrl); // 클릭한 이미지 URL 설정
+      setOpenDialog(true); // Dialog 열기
   };
 
   const handleCloseDialog = () => {
@@ -96,6 +98,7 @@ export default function PerformanceDetailPage() {
 const handleTicketPurchase = () => {
     navigate(`/payment`, {
         state: {
+            performanceId: performanceId,
             imageUrl: performanceData.imageUrl || "https://via.placeholder.com/300x200", // 이미지 URL
             title: performanceData.title, // 공연 제목
             time: `${performanceData.startDateTime} ~ ${performanceData.endDateTime}`, // 공연 시간
@@ -155,8 +158,8 @@ const handleTicketPurchase = () => {
             </Link>
           </Grid>
           <Grid item md={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <img 
-                src="/logo192.png" 
+              <img
+                src={performanceData?.imageUrl || "/logo192.png"}
                 alt="Performance Image" 
                 style={{ width: '100%', height: '100%', cursor: 'pointer' }} // 커서 포인터 추가
                 onClick={handleImageClick} // 클릭 핸들러 추가
@@ -210,7 +213,9 @@ const handleTicketPurchase = () => {
           </Grid>
           <Grid item xs={15} sm={5}>
             <Typography variant="subtitle1">장소</Typography>
-            <Typography>{performanceData.address}</Typography>
+              <Typography>{performanceData.address}</Typography>
+            <KakaoMap address={performanceData.address} /> {/* KakaoMap 컴포넌트 사용 */}
+
           </Grid>
           <Grid item xs={5} sm={2}>
             <Typography variant="subtitle1">가격</Typography>

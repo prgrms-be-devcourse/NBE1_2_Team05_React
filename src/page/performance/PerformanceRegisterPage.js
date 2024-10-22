@@ -33,6 +33,14 @@ const UploadBox = styled(Paper)(({ theme }) => ({
     },
 }));
 
+// 다음 우편번호 API 스크립트 추가
+const loadDaumPostcodeScript = () => {
+    const script = document.createElement('script');
+    script.src = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+    script.async = true;
+    document.body.appendChild(script);
+};
+
 const DatePickerField = ({ label, value, onChange }) => (
     <DatePicker
         label={label}
@@ -90,6 +98,7 @@ const PerformanceRegisterPage = () => {
     const navigate = useNavigate(); // useNavigate 훅 사용
 
     useEffect(() => {
+        loadDaumPostcodeScript(); // Daum 우편번호 API 스크립트 로드
         const getCategories = async () => {
             try {
                 const data = await fetchCategories(); // ID로 데이터 요청
@@ -138,6 +147,33 @@ const PerformanceRegisterPage = () => {
             setError(err.message); // 에러 처리
         }
     };
+
+    // 우편번호 검색 핸들러 함수
+    const handleAddressSearch = () => {
+        new window.daum.Postcode({
+            oncomplete: (data) => {
+                let fullAddress = data.address;
+                let extraAddress = '';
+
+                if (data.addressType === 'R') {
+                    if (data.bname !== '') {
+                        extraAddress += data.bname;
+                    }
+                    if (data.buildingName !== '') {
+                        extraAddress += (extraAddress !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    fullAddress += (extraAddress !== '' ? ' (' + extraAddress + ')' : '');
+                }
+
+                // 검색된 주소를 폼 데이터에 반영
+                setFormData(prevFormData => ({
+                    ...prevFormData,
+                    address: fullAddress
+                }));
+            }
+        }).open();
+    };
+
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
@@ -220,8 +256,8 @@ const PerformanceRegisterPage = () => {
                                 value={formData.location}
                                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                             />
-                            <Button variant="text" color="primary" sx={{ mt: 1 }}>
-                                우편번호 찾기
+                            <Button variant="text" color="primary" sx={{ mt: 1 }} onClick={handleAddressSearch}>
+                                주소 검색하기
                             </Button>
                             <TextFieldWithLabel
                                 label="세부 주소"
@@ -285,10 +321,11 @@ const PerformanceRegisterPage = () => {
                             <input
                                 type="file"
                                 id="fileInput"
-                                accept="image/*"
+                                accept=".jpg,.jpeg,.png,.gif,.bmp"
                                 onChange={handleImageChange}
                                 style={{ display: 'none' }}
                             />
+
                             <Button fullWidth variant="contained" color="secondary" sx={{ mt: 2, mb: 5 }} onClick={triggerFileInput}>
                                 추가 버튼
                             </Button>

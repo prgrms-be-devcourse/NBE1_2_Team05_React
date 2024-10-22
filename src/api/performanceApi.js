@@ -5,6 +5,9 @@ const itemsPerPage = 16; // 페이지당 아이템 수
 const performancesPerPage = 6; //페이지당 공연 수
 const totalItems = 100; // 총 아이템 수 (예시로 100개)
 
+// 기본 이미지 URL
+const defaultImageUrl = 'http://121.88.130.215:8888/upload/pfmPoster/acf26351-277d-4c53-a9b2-3c1d253ef8e4.gif';
+
 // 카테고리 데이터 조회
 export const fetchCategories = async () => {
     try {
@@ -30,10 +33,17 @@ export const fetchData = async (pageNum = 1, category = null, search = '') => {
                 search: search, // 검색어 추가
             }
         });
+
+        // imageUrl이 null일 경우 기본 이미지 설정
+        const performances = response.data.result.performanceList.map(performance => ({
+            ...performance,
+            imageUrl: performance.imageUrl || defaultImageUrl,
+        }));
+
         console.log(response.data.result);
         return {
             totalElements: response.data.result.totalElements,
-            performances: response.data.result.performanceList || []
+            performances: performances || []
         };
     } catch (err) {
         throw new Error(err.message);
@@ -54,7 +64,7 @@ export const fetchDetailData = async (performanceId = null) => {
             description: item.description,
             maxAudience: item.maxAudience,
             address: item.address,
-            imageUrl: item.imageUrl,
+            imageUrl: item.imageUrl || defaultImageUrl,
             price: item.price,
             remainingTickets: item.remainingTickets,
             startDate: item.startDate,
