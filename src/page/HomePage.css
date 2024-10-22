@@ -22,6 +22,7 @@ h2 {
     align-items: center;
 }
 
+
 .scrollable-row {
     display: flex;
     overflow-x: auto;
@@ -29,10 +30,34 @@ h2 {
     padding-bottom: 20px;
     scroll-behavior: smooth; /* 스크롤 부드럽게 */
     padding-left: 0; /* 첫 번째 카드가 딱 붙도록 */
+    user-select: none;
+    cursor: grab;
 }
 
+.scrollable-row:active {
+    cursor: grabbing;
+}
+
+/* 스크롤바의 기본 트랙을 정의합니다 */
 .scrollable-row::-webkit-scrollbar {
-    display: none; /* 스크롤바 숨김 */
+    width: 8px; /* 스크롤바의 너비를 설정합니다 */
+    height: 3px; /* 가로 스크롤바의 높이 */
+}
+
+/* 스크롤바의 트랙(기본 바탕) */
+.scrollable-row::-webkit-scrollbar-track {
+    background: #f1f1f1; /* 트랙의 배경색을 설정 */
+}
+
+/* 스크롤바의 핸들(드래그할 수 있는 부분) */
+.scrollable-row::-webkit-scrollbar-thumb {
+    background: #888; /* 핸들의 색상을 설정 */
+    border-radius: 10px; /* 핸들을 둥글게 만듦 */
+}
+
+/* 스크롤바 핸들에 마우스를 올렸을 때 색상 변경 */
+.scrollable-row::-webkit-scrollbar-thumb:hover {
+    background: #555; /* 마우스 오버 시 색상 */
 }
 
 .scroll-arrow {

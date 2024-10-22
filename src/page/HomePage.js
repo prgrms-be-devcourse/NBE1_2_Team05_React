@@ -1,42 +1,37 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import PerformanceCard from '../component/performance/PerformanceCard';
 import { CircularProgress } from '@mui/material';
 import { fetchData, fetchFavoritePerformances } from '../api/performanceApi';
 import './HomePage.css';
-import { useAuth } from "../context/AuthContext";
-import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import Typography from '@mui/material/Typography';
+import { useDraggable } from '../hook/useDraggable';
+
+function Copyright(props) {
+    return (
+        <Typography variant="body2" color="text.secondary" align="center" {...props}>
+            {'Copyright © '}
+            Social Culture
+            {new Date().getFullYear()}
+            {'.'}
+        </Typography>
+    );
+}
 
 const HomePage = () => {
-    const [performances, setPerformances] = useState([]); // 전체 공연 데이터 상태
-    const [favoritePerformances, setFavoritePerformances] = useState([]); // 선호 공연 데이터 상태
-    const [loadingPerformances, setLoadingPerformances] = useState(true); // 전체 공연 로딩 상태
-    const [loadingFavorites, setLoadingFavorites] = useState(true); // 선호 공연 로딩 상태
-    const [error, setError] = useState(null); // 에러 상태
-    const { userName, isLoggedIn } = useAuth();  // 사용자 로그인 정보
+    const [performances, setPerformances] = useState([]);
+    const [favoritePerformances, setFavoritePerformances] = useState([]);
+    const [loadingPerformances, setLoadingPerformances] = useState(true);
+    const [loadingFavorites, setLoadingFavorites] = useState(true);
+    const [error, setError] = useState(null);
+    const { userName, isLoggedIn } = useAuth();
     const navigate = useNavigate();
 
-    // 각 스크롤 섹션을 위한 ref와 상태 관리
-    const recommendRowRef = useRef(null);
-    const [canScrollLeftRecommend, setCanScrollLeftRecommend] = useState(false);
-    const [canScrollRightRecommend, setCanScrollRightRecommend] = useState(false);
-
-    const popularRowRef = useRef(null);
-    const [canScrollLeftPopular, setCanScrollLeftPopular] = useState(false);
-    const [canScrollRightPopular, setCanScrollRightPopular] = useState(false);
-
-    const allPerformancesRowRef = useRef(null);
-    const [canScrollLeftAllPerformances, setCanScrollLeftAllPerformances] = useState(false);
-    const [canScrollRightAllPerformances, setCanScrollRightAllPerformances] = useState(false);
-
-    // 스크롤 상태 업데이트 함수
-    const updateScrollState = (ref, setCanScrollLeft, setCanScrollRight) => {
-        const element = ref.current;
-        if (element) {
-            setCanScrollLeft(element.scrollLeft > 0);
-            setCanScrollRight(element.scrollLeft + element.clientWidth < element.scrollWidth);
-        }
-    };
+    // 드래그 훅 사용
+    const recommendScroll = useDraggable();
+    const popularScroll = useDraggable();
+    const allPerformancesScroll = useDraggable();
 
     // 전체 공연 데이터 로드
     const loadPerformances = async () => {
@@ -103,23 +98,21 @@ const HomePage = () => {
         }
     }, [isLoggedIn]);
 
-    // 스크롤 상태 업데이트
-    useEffect(() => {
-        if (recommendRowRef.current) updateScrollState(recommendRowRef, setCanScrollLeftRecommend, setCanScrollRightRecommend);
-        if (popularRowRef.current) updateScrollState(popularRowRef, setCanScrollLeftPopular, setCanScrollRightPopular);
-        if (allPerformancesRowRef.current) updateScrollState(allPerformancesRowRef, setCanScrollLeftAllPerformances, setCanScrollRightAllPerformances);
-    }, [performances]);
-
-    // 로딩 중일 때 로딩 스피너 표시
     if (loadingPerformances || (isLoggedIn && loadingFavorites)) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100vh',
+                }}
+            >
                 <CircularProgress />
             </div>
         );
     }
 
-    // 에러가 있을 경우 에러 메시지 표시
     if (error) {
         return <div>Error: {error}</div>;
     }
@@ -131,13 +124,26 @@ const HomePage = () => {
                 <div className="section" style={{ marginTop: '40px' }}>
                     <h2>{userName}님을 위해 준비했어요😉</h2>
                     <div className="scrollable-row-container">
-                        {canScrollLeftRecommend && <ArrowBackIos className="scroll-arrow left" />}
-                        <div className="scrollable-row" ref={recommendRowRef}>
+                        <div
+                            className="scrollable-row"
+                            ref={recommendScroll.ref}
+                            onMouseDown={recommendScroll.onMouseDown}
+                            onMouseMove={recommendScroll.onMouseMove}
+                            onMouseUp={recommendScroll.onMouseUp}
+                            onMouseLeave={recommendScroll.onMouseLeave}
+                            onClick={recommendScroll.onClick}
+                            onDragStart={(e) => e.preventDefault()}
+                            style={{ cursor: recommendScroll.isDragging ? 'grabbing' : 'grab' }}
+                        >
                             {favoritePerformances.map((performance) => (
-                                <PerformanceCard key={performance.performanceId} {...performance} />
+                                <PerformanceCard
+                                    key={performance.performanceId}
+                                    {...performance}
+                                    onClick={recommendScroll.onClick}
+                                    isDragging={recommendScroll.isDragging}
+                                />
                             ))}
                         </div>
-                        {canScrollRightRecommend && <ArrowForwardIos className="scroll-arrow right" />}
                     </div>
                 </div>
             )}
@@ -146,16 +152,31 @@ const HomePage = () => {
             <div className="section">
                 <h2>실시간 인기 공연🏆</h2>
                 <div className="scrollable-row-container">
-                    {canScrollLeftPopular && <ArrowBackIos className="scroll-arrow left" />}
-                    <div className="scrollable-row" ref={popularRowRef}>
+                    <div
+                        className="scrollable-row"
+                        ref={popularScroll.ref}
+                        onMouseDown={popularScroll.onMouseDown}
+                        onMouseMove={popularScroll.onMouseMove}
+                        onMouseUp={popularScroll.onMouseUp}
+                        onMouseLeave={popularScroll.onMouseLeave}
+                        onClick={popularScroll.onClick}
+                        onDragStart={(e) => e.preventDefault()}
+                        style={{ cursor: popularScroll.isDragging ? 'grabbing' : 'grab' }}
+                    >
                         {performances.map((performance, index) => (
-                            <div className="performance-with-ranking" key={performance.performanceId}>
+                            <div
+                                className="performance-with-ranking"
+                                key={performance.performanceId}
+                            >
                                 <span className="ranking">{index + 1}</span>
-                                <PerformanceCard {...performance} />
+                                <PerformanceCard
+                                    {...performance}
+                                    onClick={popularScroll.onClick}
+                                    isDragging={popularScroll.isDragging}
+                                />
                             </div>
                         ))}
                     </div>
-                    {canScrollRightPopular && <ArrowForwardIos className="scroll-arrow right" />}
                 </div>
             </div>
 
@@ -167,18 +188,32 @@ const HomePage = () => {
                         전체보기&nbsp;&nbsp;&nbsp;〉
                     </div>
                 </div>
-                <div className="scrollable-row-container">
-                    {canScrollLeftAllPerformances && <ArrowBackIos className="scroll-arrow left" />}
-                    <div className="scrollable-row" ref={allPerformancesRowRef}>
-                        {performances.map((performance) => (
-                            <PerformanceCard key={performance.performanceId} {...performance} />
-                        ))}
+                    <div className="scrollable-row-container">
+                        <div
+                            className="scrollable-row"
+                            ref={allPerformancesScroll.ref}
+                            onMouseDown={allPerformancesScroll.onMouseDown}
+                            onMouseMove={allPerformancesScroll.onMouseMove}
+                            onMouseUp={allPerformancesScroll.onMouseUp}
+                            onMouseLeave={allPerformancesScroll.onMouseLeave}
+                            onClick={allPerformancesScroll.onClick}
+                            onDragStart={(e) => e.preventDefault()}
+                            style={{cursor: allPerformancesScroll.isDragging ? 'grabbing' : 'grab'}}
+                        >
+                            {performances.map((performance) => (
+                                <PerformanceCard
+                                    key={performance.performanceId}
+                                    {...performance}
+                                    onClick={allPerformancesScroll.onClick}
+                                    isDragging={allPerformancesScroll.isDragging}
+                                />
+                            ))}
+                        </div>
                     </div>
-                    {canScrollRightAllPerformances && <ArrowForwardIos className="scroll-arrow right" />}
                 </div>
+                <Copyright sx={{mt: 8, mb: 4}}/>
             </div>
-        </div>
-    );
-};
+            );
+            };
 
-export default HomePage;
+            export default HomePage;

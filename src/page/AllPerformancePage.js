@@ -6,7 +6,19 @@ import { fetchCategories, fetchData } from '../api/performanceApi';
 import { Search } from '@mui/icons-material'; // 돋보기 아이콘 추가
 import './AllPerformancePage.css';
 import { Link } from 'react-router-dom';
-import { Add } from '@mui/icons-material'; // 공연 추가 버튼에 + 아이콘
+import { Add } from '@mui/icons-material';
+import Typography from "@mui/material/Typography"; // 공연 추가 버튼에 + 아이콘
+
+function Copyright(props) {
+    return (
+        <Typography variant="body2" color="text.secondary" align="center" {...props}>
+            {'Copyright © '}
+            Social Culture
+            {new Date().getFullYear()}
+            {'.'}
+        </Typography>
+    );
+}
 
 const AllPerformancePage = () => {
     const [page, setPage] = useState(1);
@@ -185,6 +197,7 @@ const AllPerformancePage = () => {
                     <Add />
                 </div>
             </Link>
+            <Copyright sx={{ mt: 8, mb: 4 }} />
         </div>
     );
 };
