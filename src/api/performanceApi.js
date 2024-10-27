@@ -163,6 +163,7 @@ export const fetchPopularPerformances = async () => {
             performances: response.data.result.performanceList || [],
         };
     } catch (err) {
-        throw new Error(err.message);
+        throw err;  // 원래의 에러 객체를 그대로 던짐
     }
 };
+
