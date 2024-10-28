@@ -14,7 +14,7 @@ const ChatWindow = () => {
     const [chatRooms, setChatRooms] = useState([]);
     const [filteredRooms, setFilteredRooms] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [openChatRooms, setOpenChatRooms] = useState([]);
+    const [openChatRooms, setOpenChatRooms] = useState([]); // chatRoom 객체 배열로 저장
 
     useEffect(() => {
         setPreviousSize(prevSize => ({
@@ -56,11 +56,14 @@ const ChatWindow = () => {
     }, [searchTerm, chatRooms]);
 
     const handleRoomSelect = (roomId) => {
-        setOpenChatRooms([...openChatRooms, roomId]);
+        const selectedRoom = chatRooms.find(room => room.chatRoomId === roomId);
+        if (selectedRoom) {
+            setOpenChatRooms([...openChatRooms, selectedRoom]); // 객체 형태로 저장
+        }
     };
 
     const handleCloseChatRoom = (roomId) => {
-        setOpenChatRooms(openChatRooms.filter(id => id !== roomId));
+        setOpenChatRooms(openChatRooms.filter(room => room.chatRoomId !== roomId));
     };
 
     const renderChatWindowModal = () => (
@@ -226,12 +229,14 @@ const ChatWindow = () => {
                 나의 채팅
             </Button>
             {isOpen && ReactDOM.createPortal(renderChatWindowModal(), document.body)}
-            {openChatRooms.map((roomId) =>
+            {openChatRooms.map(({ chatRoomId, title, imageUrl }) =>
                 ReactDOM.createPortal(
                     <ChatRoom
-                        key={roomId}
-                        chatRoomId={roomId}
-                        closeRoom={() => handleCloseChatRoom(roomId)}
+                        key={chatRoomId}
+                        chatRoomId={chatRoomId}
+                        performanceTitle={title}
+                        performanceImageUrl={imageUrl}
+                        closeRoom={() => handleCloseChatRoom(chatRoomId)}
                     />,
                     document.body
                 )
