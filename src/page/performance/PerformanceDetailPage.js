@@ -123,9 +123,11 @@ export default function PerformanceDetailPage() {
         try {
             const data = await getFirstComeCoupon(performanceId);
 
-            if (!data.expireTime) {
+            if (data.code === "COUPON400") {
                 alert(`${data.message}`);
                 setCouponExpiration(true);
+            } else if (data.code === "COUPON401") {
+                alert(`${data.message}`);
             } else {
                 const expireDate = new Date(data.expireTime);
                 const formattedExpireTime = `${expireDate.getFullYear()}년 ${expireDate.getMonth() + 1}월 ${expireDate.getDate()}일`;

@@ -35,7 +35,7 @@ export const getFirstComeCoupon = async (performanceId) => {
     } catch (error) {
         if (error.response) {
             const errorData = error.response.data;
-            return {message: errorData.message};
+            return {message: errorData.message, code: errorData.code};
         }
     }
 };
