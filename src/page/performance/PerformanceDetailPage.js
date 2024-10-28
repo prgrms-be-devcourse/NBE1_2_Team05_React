@@ -33,6 +33,8 @@ export default function PerformanceDetailPage() {
     const [error, setError] = useState(null);
     const [openDialog, setOpenDialog] = useState(false); // Dialog 상태 관리
     const [selectedImage, setSelectedImage] = useState('');
+    const [couponExpiration, setCouponExpiration] = useState(false);
+
 
     const [formData, setFormData] = useState({
         status: ''
@@ -45,6 +47,12 @@ export default function PerformanceDetailPage() {
                 const data = await fetchDetailData(performanceId); // ID로 데이터 요청
                 console.log(data)
                 setPerformanceData(data);
+
+                if (data.firstComeCoupons && data.firstComeCoupons.every(coupon => coupon.expireTime !== null)) {
+                    setCouponExpiration(true);
+                } else {
+                    setCouponExpiration(false);
+                }
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -110,11 +118,29 @@ export default function PerformanceDetailPage() {
         });
     };
 
-//선착순 쿠폰 발급 핸들러
+    //선착순 쿠폰 발급 핸들러
     const handleFirstComeCoupon = async () => {
         try {
             const data = await getFirstComeCoupon(performanceId);
-            alert(`${data.message} 유효기간은 ${data.expireTime}입니다.`);
+
+            if (!data.expireTime) {
+                alert(`${data.message}`);
+                setCouponExpiration(true);
+            } else {
+                const expireDate = new Date(data.expireTime);
+                const formattedExpireTime = `${expireDate.getFullYear()}년 ${expireDate.getMonth() + 1}월 ${expireDate.getDate()}일`;
+                alert(`${data.message} 유효기간은 ${formattedExpireTime}까지 입니다.`);
+            }
+
+            // 쿠폰 데이터 최신화
+            setPerformanceData(prevData => ({
+                ...prevData,
+                firstComeCoupons: prevData.firstComeCoupons.map(coupon =>
+                    coupon.couponId === data.couponId
+                        ? { ...coupon, expireTime: data.expireTime }
+                        : coupon
+                )
+            }));
         } catch (err) {
             alert(`에러: ${err.message}`);
         }
@@ -236,10 +262,24 @@ export default function PerformanceDetailPage() {
                 </Grid>
 
                 <Divider sx={{ my: 3 }} />
-                <Grid item xs={12} sm={4}>
-                    <Typography variant="subtitle1">선착순 10% 할인 쿠폰 (3명 한정)</Typography>
-                </Grid>
-                <Button variant="outlined" onClick={handleFirstComeCoupon}>선착순 쿠폰 받기</Button>
+                {performanceData.firstComeCoupons && (
+                    <Grid container alignItems="center">
+                        <Grid item xs={12} sm={4}>
+                            <Typography variant="subtitle1">선착순 10% 할인 쿠폰 (3명 한정)</Typography>
+                        </Grid>
+                        <Grid item>
+                            {couponExpiration ? (
+                                <Button variant="outlined" disabled>
+                                    선착순 쿠폰 마감
+                                </Button>
+                            ) : (
+                                <Button variant="outlined" onClick={handleFirstComeCoupon}>
+                                    선착순 쿠폰 받기
+                                </Button>
+                            )}
+                        </Grid>
+                    </Grid>
+                )}
                 <Divider sx={{ my: 3 }} />
 
                 <Grid item xs={12} sm={4}>

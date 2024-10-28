@@ -30,7 +30,7 @@ export const getFirstComeCoupon = async (performanceId) => {
         // 성공적으로 200 응답이 왔을 때 처리
         if (response.data.isSuccess) {
             console.log(response.data);
-            return {message: "선착순 쿠폰이 발급되었습니다.", expireTime: response.data.expireTime};
+            return {message: "선착순 쿠폰이 발급되었습니다.", expireTime: response.data.result.expireTime};
         }
     } catch (error) {
         if (error.response) {
