@@ -153,3 +153,18 @@ export const fetchFavoritePerformances = async () => {
         throw new Error(err.message);
     }
 };
+
+
+// 실시간 인기 공연 조회
+export const fetchPopularPerformances = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/performances/rank`);
+        return {
+            totalElements: response.data.result.totalElements,
+            performances: response.data.result.performanceList || [],
+        };
+    } catch (err) {
+        throw err;  // 원래의 에러 객체를 그대로 던짐
+    }
+};
+
