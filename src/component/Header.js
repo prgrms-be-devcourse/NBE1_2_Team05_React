@@ -10,12 +10,13 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";  // useAuth 사용
-import { Stack } from "@mui/material";
+import {useNavigate} from "react-router-dom";
+import {useAuth} from "../context/AuthContext"; // useAuth 사용
+import {Container, Stack} from "@mui/material";
 import somunLogo from '../assets/image/somun.png';
-import {Container} from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person'
+import ChatWindow from "./chat/ChatWindow";
+import ReactDOM from 'react-dom';
 
 
 // 페이지 및 링크 관리 객체
@@ -208,6 +209,9 @@ function Header() {
                         </Stack>
                     ) : (
                         <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center' }}>
+                            {/* 채팅 버튼 추가 */}
+                            <ChatWindow />
+
                             <Box
                                 sx={{
                                     display: 'flex',
@@ -223,7 +227,7 @@ function Header() {
 
                                 <Tooltip title="Open settings">
                                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                        <Avatar sx={{ backgroundColor: '#ccc' }}> 
+                                        <Avatar sx={{ backgroundColor: '#ccc' }}>
                                             <PersonIcon />
                                         </Avatar>
                                     </IconButton>

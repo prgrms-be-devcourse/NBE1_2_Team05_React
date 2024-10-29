@@ -73,6 +73,7 @@ export const fetchDetailData = async (performanceId = null) => {
             createdAt: item.createdAt,
             updatedAt: item.updatedAt,
             categories: item.categories,
+            firstComeCoupons: item.firstComeCoupons,
         };
     } catch (err) {
         throw new Error(err.message);

@@ -19,3 +19,23 @@ export const getAllCouponsByMemberEmail = async () => {
         throw error;  // 에러 처리
     }
 };
+
+//선착순 쿠폰 발급
+export const getFirstComeCoupon = async (performanceId) => {
+    try {
+        const response = await axios.patch(`${API_BASE_URL}`, {
+            performanceId
+        });
+
+        // 성공적으로 200 응답이 왔을 때 처리
+        if (response.data.isSuccess) {
+            console.log(response.data);
+            return {message: "선착순 쿠폰이 발급되었습니다.", expireTime: response.data.result.expireTime};
+        }
+    } catch (error) {
+        if (error.response) {
+            const errorData = error.response.data;
+            return {message: errorData.message, code: errorData.code};
+        }
+    }
+};
