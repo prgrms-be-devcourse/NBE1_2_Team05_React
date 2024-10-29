@@ -209,7 +209,7 @@ export default function MemberCategoryPage() {
 
                     {isInitialFavoriteLoaded ? (
                         <Typography
-                            onClick={() => navigate('/mypage')}
+                            onClick={() => navigate('/member/profile')}
                             sx={{
                                 mt: 0,
                                 cursor: 'pointer',
