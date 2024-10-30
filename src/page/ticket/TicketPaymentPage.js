@@ -47,9 +47,9 @@ function PeopleCounter({ numPeople, handleDecrease, handleIncrease, handleInputC
     );
 }
 // 쿠폰 데이터를 가져오는 함수
-const fetchCoupons = async () => {
+const fetchCoupons = async (performanceId) => {
     try {
-        const couponData = await getAllCouponsByMemberEmail();
+        const couponData = await getAllCouponsByMemberEmail(performanceId);
         return couponData;  // 쿠폰 데이터를 반환
     } catch (error) {
         console.error('Failed to fetch coupons:', error);
@@ -58,13 +58,13 @@ const fetchCoupons = async () => {
 };
 
 // CouponSelector 컴포넌트 수정
-function CouponSelector({ selectedCoupon, setSelectedCoupon, setSelectedCouponPercent }) {
+function CouponSelector({ performanceId, selectedCoupon, setSelectedCoupon, setSelectedCouponPercent }) {
     const [coupons, setCoupons] = useState([]);
 
     useEffect(() => {
         const loadCoupons = async () => {
             try {
-                const couponData = await fetchCoupons();
+                const couponData = await fetchCoupons(performanceId);
                 const noCouponOption = { couponId: -1, name: '선택 안함', percent: 0 };
 
                 if (couponData.length === 0) {
@@ -86,7 +86,7 @@ function CouponSelector({ selectedCoupon, setSelectedCoupon, setSelectedCouponPe
         };
 
         loadCoupons();
-    }, [setSelectedCoupon, setSelectedCouponPercent]);
+    }, [performanceId, setSelectedCoupon, setSelectedCouponPercent]);
 
     const handleCouponChange = (event) => {
         const selectedCouponId = event.target.value;
@@ -116,7 +116,7 @@ function CouponSelector({ selectedCoupon, setSelectedCoupon, setSelectedCouponPe
 }
 
 // PaymentInfo 컴포넌트에서 TableCell 수정
-function PaymentInfo({ numPeople, performancePrice, totalPayment, selectedCoupon, setSelectedCoupon, setSelectedCouponPercent, handleDecrease, handleIncrease, handleInputChange }) {
+function PaymentInfo({ numPeople, performancePrice, totalPayment, selectedCoupon, setSelectedCoupon, setSelectedCouponPercent, handleDecrease, handleIncrease, handleInputChange, performanceId }) {
     return (
         <TableContainer component={Paper} sx={{ marginTop: 4 }}>
             <Table>
@@ -140,6 +140,7 @@ function PaymentInfo({ numPeople, performancePrice, totalPayment, selectedCoupon
                         <TableCell>할인 쿠폰</TableCell>
                         <TableCell align="right" sx={{ width: '150px' }}>
                             <CouponSelector
+                                performanceId={performanceId}
                                 selectedCoupon={selectedCoupon}
                                 setSelectedCoupon={setSelectedCoupon}
                                 setSelectedCouponPercent={setSelectedCouponPercent}
@@ -210,6 +211,7 @@ export default function TicketPaymentPage() {
 
                         {/* 테이블로 정리된 결제 정보 */}
                         <PaymentInfo
+                            performanceId={performanceId}
                             numPeople={numPeople}
                             performancePrice={performancePrice}
                             totalPayment={calculateTotalPrice()}

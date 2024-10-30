@@ -4,9 +4,13 @@ import AxiosInterceptor from "./axiosInterceptor";
 const API_BASE_URL = 'http://localhost:8080/api/v1/coupons';  // 쿠폰 API의 Base URL
 
 // 나의 쿠폰 리스트 조회
-export const getAllCouponsByMemberEmail = async () => {
+export const getAllCouponsByMemberEmail = async (performanceId) => {
     try {
-        const response = await axios.get(`${API_BASE_URL}`);
+        const response = await axios.get(`${API_BASE_URL}`, {
+            params: {
+                performanceId: performanceId
+            }
+        });
 
         return response.data.result.map(item => ({
             couponId: item.couponId,
