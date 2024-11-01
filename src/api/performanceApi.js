@@ -168,6 +168,7 @@ export const fetchPopularPerformances = async () => {
     }
 };
 
+<<<<<<< Updated upstream
 // 특정 지점 주변 공연 조회
 export const fetchPerformancesAroundPoint = async (pageNum = 1, latitude, longitude) => {
     try {
@@ -195,3 +196,27 @@ export const fetchPerformancesAroundPoint = async (pageNum = 1, latitude, longit
     }
 };
 
+=======
+export const enterQueue = async (performanceId) => {
+    try {
+        const response = await axios.post(
+            `${API_URL}/performances/queue/enter`,
+            null, // Request body is empty
+            {
+                params: { performanceId }, // Pass performanceId as URL parameter
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+        return response.data;
+    } catch (err) {
+        console.error('Error entering queue:', err);
+        throw new Error(err.message);
+    }
+};
+
+
+
+
+>>>>>>> Stashed changes

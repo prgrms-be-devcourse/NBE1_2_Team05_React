@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchDetailData, confirmPerformance } from '../../api/performanceApi'; // API 요청 함수
 import CommentList from '../../component/comment/CommentList'
+// PerformanceDetailPage.js
+import { enterQueue } from '../../api/performanceApi'; // enterQueue 함수 import
+
 import {
     Container,
     Typography,
@@ -104,19 +107,28 @@ export default function PerformanceDetailPage() {
         }
     };
 
-// 티켓 구매 핸들러
-    const handleTicketPurchase = () => {
-        navigate(`/payment`, {
-            state: {
-                performanceId: performanceId,
-                imageUrl: performanceData.imageUrl || "https://via.placeholder.com/300x200", // 이미지 URL
-                title: performanceData.title, // 공연 제목
-                time: `${performanceData.startDateTime} ~ ${performanceData.endDateTime}`, // 공연 시간
-                performancePrice: performanceData.price, // 가격
-                remainingTickets: performanceData.remainingTickets // 남은 티켓 수
+    const handleTicketPurchase = async () => {
+        console.log("performanceId " + performanceId)
+        try {
+            const response = await enterQueue(performanceId); // performanceId를 전달
+            if (response.success) {
+                console.log(`대기열에 추가되었습니다. 현재 대기 순위: ${response.data.rank}`);
+                navigate(`/payment`, {
+                    state: {
+                        performanceId: performanceData.performanceId,
+                        imageUrl: performanceData.imageUrl || "https://via.placeholder.com/300x200",
+                        title: performanceData.title,
+                        time: `${performanceData.startDateTime} ~ ${performanceData.endDateTime}`,
+                        performancePrice: performanceData.price,
+                        remainingTickets: performanceData.remainingTickets,
+                    }
+                });
             }
-        });
+        } catch (error) {
+            console.error("티켓 구매 오류:", error);
+        }
     };
+
 
     //선착순 쿠폰 발급 핸들러
     const handleFirstComeCoupon = async () => {
