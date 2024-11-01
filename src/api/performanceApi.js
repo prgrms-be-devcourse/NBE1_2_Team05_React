@@ -168,3 +168,30 @@ export const fetchPopularPerformances = async () => {
     }
 };
 
+// 특정 지점 주변 공연 조회
+export const fetchPerformancesAroundPoint = async (pageNum = 1, latitude, longitude) => {
+    try {
+        const response = await axios.get(`${API_URL}/performances/around-point`, {
+            params: {
+                latitude: latitude,
+                longitude: longitude,
+                page: pageNum - 1,
+                size: performancesPerPage
+            },
+        });
+
+        // imageUrl이 null일 경우 기본 이미지 설정
+        const performances = response.data.result.performanceList.map(performance => ({
+            ...performance,
+            imageUrl: performance.imageUrl || defaultImageUrl,
+        }));
+
+        return {
+            totalElements: response.data.result.totalElements,
+            performances: performances || []
+        };
+    } catch (err) {
+        throw err;  // 원래의 에러 객체를 그대로 던짐
+    }
+};
+

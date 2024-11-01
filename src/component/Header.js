@@ -21,8 +21,8 @@ import ReactDOM from 'react-dom';
 
 // 페이지 및 링크 관리 객체
 const PAGE_LINKS = {
-    CATEGORY_1: { name: '카테고리1', link: '/category1' },
-    CATEGORY_2: { name: '카테고리2', link: '/category2' },
+    CATEGORY_1: { name: '모든 공연', link: '/all' },
+    CATEGORY_2: { name: '근처 공연 보기', link: '/performance/finder' },
     CATEGORY_3: { name: '카테고리3', link: '/category3' },
     SIGNIN: { name: '로그인', link: '/signin' },
     SIGNUP: { name: '회원가입', link: '/signup' },

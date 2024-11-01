@@ -5,6 +5,7 @@ import SigninPage from './page/member/SigninPage';
 import SignupPage from './page/member/SignupPage';
 import PerformanceRegisterPage from './page/performance/PerformanceRegisterPage';
 import PerformanceDetailPage from './page/performance/PerformanceDetailPage';
+import PerformanceFinderPage from './page/performance/PerformanceFinderPage';
 import UserProfilePage from './page/member/MemberProfilePage';
 import {useAuth} from "./context/AuthContext";
 import NicknamePage from "./page/member/NicknamePage";
@@ -53,6 +54,7 @@ function Layout() {
                 <Route path="/widget/success" element={<WidgetSuccessPage />} />
                 <Route path="/fail" element={<FailPage />} />
 
+                <Route path="/performance/finder" element={<PerformanceFinderPage />} />
 
                 {/* 로그인 여부에 따라 페이지 접근 제한 */}
                 <Route path="/performance/:performanceId" element={<PerformanceDetailPage />} />

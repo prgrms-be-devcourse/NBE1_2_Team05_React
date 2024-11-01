@@ -82,6 +82,8 @@ const PerformanceRegisterPage = () => {
         title: '',
         location: '',
         address: '',
+        latitude: '',
+        longitude: '',
         description: '',
         maxAudience: '',
         organizer: '',
@@ -126,6 +128,8 @@ const PerformanceRegisterPage = () => {
             dateEndTime: formData.dateEndTime,
             location: formData.location,
             address: formData.address,
+            latitude: formData.latitude,
+            longitude: formData.longitude,
             description: formData.description,
             maxAudience: formData.maxAudience,
             organizer: formData.organizer,
@@ -148,10 +152,26 @@ const PerformanceRegisterPage = () => {
         }
     };
 
+    const getCoordinatesFromAddress = (address) => {
+      return new Promise((resolve, reject) => {
+        const kakao = window.kakao;
+        const geocoder = new kakao.maps.services.Geocoder();
+        
+        geocoder.addressSearch(address, (result, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+                const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                resolve(coords);
+            } else {
+                reject('주소 검색 실패: ' + status);
+            }
+        });
+      });
+    };
+
     // 우편번호 검색 핸들러 함수
-    const handleAddressSearch = () => {
+    const handleAddressSearch = async () => {
         new window.daum.Postcode({
-            oncomplete: (data) => {
+            oncomplete: async (data) => {
                 let fullAddress = data.address;
                 let extraAddress = '';
 
@@ -163,6 +183,8 @@ const PerformanceRegisterPage = () => {
                         extraAddress += (extraAddress !== '' ? ', ' + data.buildingName : data.buildingName);
                     }
                     fullAddress += (extraAddress !== '' ? ' (' + extraAddress + ')' : '');
+
+
                 }
 
                 // 검색된 주소를 폼 데이터에 반영
@@ -170,6 +192,22 @@ const PerformanceRegisterPage = () => {
                     ...prevFormData,
                     address: fullAddress
                 }));
+
+                // 주소를 이용해 좌표 검색
+                try {
+                  const coords = await getCoordinatesFromAddress(fullAddress);
+                  console.log('좌표:', coords);
+                  console.log('위도 경도: ', coords.getLat(), coords.getLng())
+
+                  // 상태에 좌표 저장
+                  setFormData(prevFormData => ({
+                      ...prevFormData,
+                      latitude: coords.getLat(),
+                      longitude: coords.getLng()
+                  }));
+                } catch (error) {
+                    console.error(error);
+                }
             }
         }).open();
     };

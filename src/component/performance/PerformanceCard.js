@@ -7,7 +7,7 @@ import { GiTwoCoins } from 'react-icons/gi';
 
 const PerformanceCard = ({
                              performanceId,
-                             imageUrl,
+                             imageUrl = '',
                              title,
                              startDateTime,
                              endDateTime,
@@ -18,6 +18,7 @@ const PerformanceCard = ({
                              isDragging,
                          }) => {
     const defaultImageUrl = '/logo192.png';
+    console.log(performanceId, imageUrl, title, startDateTime, endDateTime, price, address, remainingTicket, onClick, isDragging)
 
     // 날짜 포맷팅 함수
     const formatDate = (dateString) => {
