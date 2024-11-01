@@ -168,7 +168,6 @@ export const fetchPopularPerformances = async () => {
     }
 };
 
-<<<<<<< Updated upstream
 // 특정 지점 주변 공연 조회
 export const fetchPerformancesAroundPoint = async (pageNum = 1, latitude, longitude) => {
     try {
@@ -196,7 +195,7 @@ export const fetchPerformancesAroundPoint = async (pageNum = 1, latitude, longit
     }
 };
 
-=======
+
 export const enterQueue = async (performanceId) => {
     try {
         const response = await axios.post(
@@ -218,5 +217,3 @@ export const enterQueue = async (performanceId) => {
 
 
 
-
->>>>>>> Stashed changes
