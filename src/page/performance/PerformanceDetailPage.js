@@ -111,8 +111,10 @@ export default function PerformanceDetailPage() {
         console.log("performanceId " + performanceId)
         try {
             const response = await enterQueue(performanceId); // performanceId를 전달
-            if (response.success) {
-                console.log(`대기열에 추가되었습니다. 현재 대기 순위: ${response.data.rank}`);
+            console.log(response); // 응답 확인
+
+            if (response && response.isSuccess) {
+                console.log(`대기열에 추가되었습니다. 현재 대기 순위: ${response.result.rank}`);
                 navigate(`/payment`, {
                     state: {
                         performanceId: performanceData.performanceId,
@@ -123,6 +125,8 @@ export default function PerformanceDetailPage() {
                         remainingTickets: performanceData.remainingTickets,
                     }
                 });
+            } else {
+                console.log("티켓 구매 요청 실패:", response);
             }
         } catch (error) {
             console.error("티켓 구매 오류:", error);
