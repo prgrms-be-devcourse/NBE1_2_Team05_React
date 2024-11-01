@@ -1,5 +1,4 @@
-// ChatRoom.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Rnd } from 'react-rnd';
 import { getMessages, sendMessage } from "../../api/chatApi";
 import { FiX } from 'react-icons/fi';
@@ -15,6 +14,9 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [windowSize, setWindowSize] = useState({ width: 400, height: 500, x: 100, y: 100 });
 
+    // 스크롤을 최신 메시지로 이동시키기 위한 참조
+    const messagesEndRef = useRef(null);
+
     useEffect(() => {
         const fetchMessages = async () => {
             try {
@@ -26,6 +28,13 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
         };
         fetchMessages();
     }, [chatRoomId]);
+
+    useEffect(() => {
+        // 메시지가 추가될 때마다 스크롤을 최신 메시지로 이동
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages]);
 
     const handleSendMessage = async () => {
         if (!newMessage.trim()) return;
@@ -73,12 +82,13 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
             bounds="window"
             style={{
                 border: '1px solid black',
-                padding: '20px',
                 backgroundColor: 'white',
                 color: 'black',
                 zIndex: 1001,
                 position: 'fixed',
                 borderRadius: '8px',
+                display: 'flex',
+                flexDirection: 'column',
             }}
         >
             {/* 상단 공연 정보 표시 */}
@@ -87,7 +97,9 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
                 alignItems: 'center',
                 borderBottom: '1px solid #ddd',
                 paddingBottom: '10px',
-                marginBottom: '10px',
+                paddingTop: '10px',
+                paddingLeft: '10px',
+                paddingRight: '10px',
             }}>
                 <img
                     src={performanceImageUrl}
@@ -114,10 +126,8 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
             <div style={{
                 flex: 1,
                 overflowY: 'auto',
-                maxHeight: `${windowSize.height - 150}px`,
                 padding: '10px',
-                border: '1px solid #ddd',
-                marginBottom: '10px',
+                borderBottom: '1px solid #ddd',
             }}>
                 {messages.map((message, index) => (
                     <div key={index} style={{
@@ -126,7 +136,6 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
                         alignItems: 'flex-end',
                         marginBottom: '10px',
                     }}>
-                        {/* 왼쪽 채팅에서 사용자 이미지 */}
                         {message.senderName !== userName && (
                             <img
                                 src={DEFAULT_USER_IMAGE}
@@ -140,7 +149,6 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
                             />
                         )}
                         <div style={{ maxWidth: '70%', display: 'flex', flexDirection: 'column', alignItems: message.senderName === userName ? 'flex-end' : 'flex-start' }}>
-                            {/* 상대방인 경우에만 닉네임 표시 */}
                             {message.senderName !== userName && (
                                 <div style={{
                                     fontSize: '12px',
@@ -156,7 +164,6 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
                                 flexDirection: message.senderName === userName ? 'row-reverse' : 'row',
                                 alignItems: 'flex-end',
                             }}>
-                                {/* 메시지 콘텐츠 */}
                                 <div style={{
                                     padding: '10px',
                                     borderRadius: '10px',
@@ -167,7 +174,6 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
                                 }}>
                                     {message.messageContent}
                                 </div>
-                                {/* 메시지 전송 시간 */}
                                 <div style={{
                                     fontSize: '10px',
                                     color: '#666',
@@ -181,16 +187,27 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
                         </div>
                     </div>
                 ))}
+                {/* 스크롤 위치 조정을 위한 더미 div */}
+                <div ref={messagesEndRef} />
             </div>
 
             {/* 메시지 입력 필드 */}
-            <div style={{ display: 'flex', marginTop: '10px' }}>
+            <div style={{
+                display: 'flex',
+                padding: '10px',
+                borderTop: '1px solid #ddd',
+            }}>
                 <input
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={handleKeyDown}  // 엔터 키로 메시지 전송
-                    style={{ flex: 1, padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }}
+                    onKeyDown={handleKeyDown}
+                    style={{
+                        flex: 1,
+                        padding: '10px',
+                        border: '1px solid #ddd',
+                        borderRadius: '5px',
+                    }}
                     placeholder="메시지 입력"
                 />
             </div>
