@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Rnd } from 'react-rnd';
-import { getMessages, sendMessage } from "../../api/chatApi";
+import { getMessages } from "../../api/chatApi";
+import { connectChatSocket, disconnectChatSocket, sendChatMessage } from './ChatSocket'; // ChatSocket에서 함수들 임포트
 import { FiX } from 'react-icons/fi';
-import dayjs from 'dayjs';
 import { useAuth } from "../../context/AuthContext"; // AuthContext import
 
 const DEFAULT_USER_IMAGE = "https://via.placeholder.com/30";
 
 const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom }) => {
-    const { userName } = useAuth(); // 현재 로그인한 사용자 이름 가져오기
+    const { userName, userEmail } = useAuth(); // 현재 로그인한 사용자 이름과 이메일 가져오기
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [isFullScreen, setIsFullScreen] = useState(false);
@@ -18,6 +18,7 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
+        // 채팅방의 기존 메시지를 가져옴
         const fetchMessages = async () => {
             try {
                 const roomMessages = await getMessages(chatRoomId);
@@ -27,6 +28,16 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
             }
         };
         fetchMessages();
+
+        // WebSocket 연결
+        connectChatSocket(chatRoomId, (receivedMessage) => {
+            setMessages(prevMessages => [...prevMessages, receivedMessage]);
+        });
+
+        // 컴포넌트 언마운트 시 WebSocket 연결 해제
+        return () => {
+            disconnectChatSocket(); // 채팅방을 떠날 때만 해제
+        };
     }, [chatRoomId]);
 
     useEffect(() => {
@@ -36,16 +47,18 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
         }
     }, [messages]);
 
-    const handleSendMessage = async () => {
+    const handleSendMessage = () => {
         if (!newMessage.trim()) return;
 
-        try {
-            await sendMessage(chatRoomId, newMessage);
-            setMessages([...messages, { senderName: userName, messageContent: newMessage, sentAt: new Date() }]);
-            setNewMessage('');
-        } catch (error) {
-            console.error('Error sending message', error);
-        }
+        const messageData = {
+            senderName: userName,
+            message: newMessage
+        };
+
+        // WebSocket을 통해 메시지 전송
+        sendChatMessage(messageData);
+        // setMessages([...messages, { senderName: userName, messageContent: newMessage, formattedSentTime: new Date().toLocaleString() }]);
+        setNewMessage(''); // 입력창 초기화
     };
 
     const handleKeyDown = (e) => {
@@ -63,6 +76,11 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
             setIsFullScreen(true);
             setWindowSize({ width: window.innerWidth, height: window.innerHeight, x: 0, y: 0 });
         }
+    };
+
+    const handleCloseRoom = () => {
+        disconnectChatSocket(); // 채팅방을 나갈 때만 소켓 연결 해제
+        closeRoom(); // 부모 컴포넌트로부터 받은 방 닫기 함수 호출
     };
 
     return (
@@ -108,7 +126,7 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
                 />
                 <h3 style={{ margin: 0 }}>{performanceTitle}</h3>
                 <button
-                    onClick={closeRoom}
+                    onClick={handleCloseRoom} // 방 닫기 함수로 변경
                     style={{
                         background: 'none',
                         border: 'none',
@@ -181,7 +199,7 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
                                     marginRight: message.senderName === userName ? '5px' : '0',
                                     alignSelf: 'flex-end'
                                 }}>
-                                    {dayjs(message.sentAt).format('HH:mm')}
+                                    {message.formattedSentTime}
                                 </div>
                             </div>
                         </div>
