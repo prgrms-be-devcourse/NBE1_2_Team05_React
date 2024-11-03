@@ -8,10 +8,10 @@ import ReactDOM from 'react-dom';
 import ChatRoom from "./ChatRoom";
 import { connectChatListSocket, disconnectChatListSocket } from './ChatSocket';
 
-// 탭 이름을 상수로 정의
+// 탭 이름과 아이콘을 상수로 정의
 const TABS = {
-    REQUEST: '합류',
-    RESPONSE: '모집',
+    REQUEST: { name: '합류', icon: '👥' },
+    RESPONSE: { name: '모집', icon: '📢' },
 };
 
 const ChatWindow = () => {
@@ -43,7 +43,6 @@ const ChatWindow = () => {
         }
     };
 
-    // 각 탭에 맞는 채팅방 목록을 API에서 가져오고 목록을 초기화함
     const fetchChatRooms = async () => {
         try {
             setChatRooms([]); // 이전 목록 초기화
@@ -55,12 +54,10 @@ const ChatWindow = () => {
         }
     };
 
-    // 탭이 변경될 때 API 호출 및 목록 초기화
     useEffect(() => {
         fetchChatRooms();
     }, [activeTab]);
 
-    // WebSocket 연결 및 실시간 업데이트 수신
     useEffect(() => {
         const handleSocketMessage = (updatedRoom) => {
             setChatRooms(prevRooms =>
@@ -72,13 +69,11 @@ const ChatWindow = () => {
             );
         };
 
-        // WebSocket 연결
         connectChatListSocket(handleSocketMessage);
 
         return () => disconnectChatListSocket();
     }, [activeTab]);
 
-    // 검색 기능 업데이트
     useEffect(() => {
         const results = chatRooms.filter(room =>
             room.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -183,20 +178,6 @@ const ChatWindow = () => {
 
                 <div style={{
                     display: 'flex',
-                    justifyContent: 'center',
-                    marginBottom: '10px',
-                    gap: '10px'
-                }}>
-                    <Button variant="outlined" onClick={() => setActiveTab(TABS.REQUEST)} color={activeTab === TABS.REQUEST ? "primary" : "default"}>
-                        {TABS.REQUEST}
-                    </Button>
-                    <Button variant="outlined" onClick={() => setActiveTab(TABS.RESPONSE)} color={activeTab === TABS.RESPONSE ? "primary" : "default"}>
-                        {TABS.RESPONSE}
-                    </Button>
-                </div>
-
-                <div style={{
-                    display: 'flex',
                     alignItems: 'center',
                     border: '1px solid #ddd',
                     borderRadius: '5px',
@@ -217,6 +198,28 @@ const ChatWindow = () => {
                     <FiSearch style={{ color: '#666', fontSize: '20px', marginLeft: '5px' }} />
                 </div>
 
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'flex-start',
+                    gap: '10px',
+                    marginBottom: '10px'
+                }}>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setActiveTab(TABS.REQUEST)}
+                        color={activeTab === TABS.REQUEST ? "primary" : "default"}
+                    >
+                        {TABS.REQUEST.icon} {TABS.REQUEST.name}
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setActiveTab(TABS.RESPONSE)}
+                        color={activeTab === TABS.RESPONSE ? "primary" : "default"}
+                    >
+                        {TABS.RESPONSE.icon} {TABS.RESPONSE.name}
+                    </Button>
+                </div>
+
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <div style={{
                         flex: 1,
@@ -224,7 +227,7 @@ const ChatWindow = () => {
                         maxHeight: `${previousSize.height - 150}px`,
                         marginBottom: '10px'
                     }}>
-                        <h3>{activeTab} 채팅방 목록</h3>
+                        <h3>{activeTab.name} 채팅방 목록</h3>
                         <ul style={{ listStyleType: 'none', padding: 0 }}>
                             {filteredRooms.map((room) => (
                                 <li
