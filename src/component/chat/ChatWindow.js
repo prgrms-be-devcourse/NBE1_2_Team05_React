@@ -6,6 +6,13 @@ import { FiMaximize, FiMinimize, FiX, FiSearch } from 'react-icons/fi';
 import Button from '@mui/material/Button';
 import ReactDOM from 'react-dom';
 import ChatRoom from "./ChatRoom";
+import { connectChatListSocket, disconnectChatListSocket } from './ChatSocket';
+
+// 탭 이름과 아이콘을 상수로 정의
+const TABS = {
+    REQUEST: { name: '합류', icon: '👥' },
+    RESPONSE: { name: '모집', icon: '📢' },
+};
 
 const ChatWindow = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -14,6 +21,7 @@ const ChatWindow = () => {
     const [chatRooms, setChatRooms] = useState([]);
     const [filteredRooms, setFilteredRooms] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [activeTab, setActiveTab] = useState(TABS.REQUEST); // 초기 탭 설정
     const [openChatRooms, setOpenChatRooms] = useState([]);
 
     useEffect(() => {
@@ -35,18 +43,36 @@ const ChatWindow = () => {
         }
     };
 
+    const fetchChatRooms = async () => {
+        try {
+            setChatRooms([]); // 이전 목록 초기화
+            const rooms = await getChatRooms(activeTab === TABS.RESPONSE); // RESPONSE 탭이면 isManager=true
+            setChatRooms(rooms);
+            setFilteredRooms(rooms);
+        } catch (error) {
+            console.error('Error fetching chat rooms', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchChatRooms = async () => {
-            try {
-                const rooms = await getChatRooms();
-                setChatRooms(rooms);
-                setFilteredRooms(rooms);
-            } catch (error) {
-                console.error('Error fetching chat rooms', error);
-            }
-        };
         fetchChatRooms();
-    }, []);
+    }, [activeTab]);
+
+    useEffect(() => {
+        const handleSocketMessage = (updatedRoom) => {
+            setChatRooms(prevRooms =>
+                prevRooms.map(room =>
+                    room.chatRoomId === updatedRoom.chatRoomId
+                        ? { ...room, lastMessage: updatedRoom.lastMessage, timeAgo: updatedRoom.timeAgo, unreadCount: updatedRoom.unreadCount }
+                        : room
+                )
+            );
+        };
+
+        connectChatListSocket(handleSocketMessage);
+
+        return () => disconnectChatListSocket();
+    }, [activeTab]);
 
     useEffect(() => {
         const results = chatRooms.filter(room =>
@@ -56,11 +82,14 @@ const ChatWindow = () => {
     }, [searchTerm, chatRooms]);
 
     const handleRoomSelect = (roomId) => {
-        setOpenChatRooms([...openChatRooms, roomId]);
+        const selectedRoom = chatRooms.find(room => room.chatRoomId === roomId);
+        if (selectedRoom) {
+            setOpenChatRooms([...openChatRooms, selectedRoom]);
+        }
     };
 
     const handleCloseChatRoom = (roomId) => {
-        setOpenChatRooms(openChatRooms.filter(id => id !== roomId));
+        setOpenChatRooms(openChatRooms.filter(room => room.chatRoomId !== roomId));
     };
 
     const renderChatWindowModal = () => (
@@ -72,7 +101,7 @@ const ChatWindow = () => {
                 width: '100vw',
                 height: '100vh',
                 zIndex: 1000,
-                pointerEvents: 'none' // 외부 클릭 허용
+                pointerEvents: 'none'
             }}
         >
             <Rnd
@@ -95,7 +124,7 @@ const ChatWindow = () => {
                     zIndex: 1001,
                     position: 'relative',
                     borderRadius: '8px',
-                    pointerEvents: 'auto' // 모달 내부 클릭 허용
+                    pointerEvents: 'auto'
                 }}
                 onDragStop={(e, d) => setPreviousSize({ ...previousSize, x: d.x, y: d.y })}
                 onResizeStop={(e, direction, ref, delta, position) => {
@@ -169,6 +198,28 @@ const ChatWindow = () => {
                     <FiSearch style={{ color: '#666', fontSize: '20px', marginLeft: '5px' }} />
                 </div>
 
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'flex-start',
+                    gap: '10px',
+                    marginBottom: '10px'
+                }}>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setActiveTab(TABS.REQUEST)}
+                        color={activeTab === TABS.REQUEST ? "primary" : "default"}
+                    >
+                        {TABS.REQUEST.icon} {TABS.REQUEST.name}
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setActiveTab(TABS.RESPONSE)}
+                        color={activeTab === TABS.RESPONSE ? "primary" : "default"}
+                    >
+                        {TABS.RESPONSE.icon} {TABS.RESPONSE.name}
+                    </Button>
+                </div>
+
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <div style={{
                         flex: 1,
@@ -176,7 +227,7 @@ const ChatWindow = () => {
                         maxHeight: `${previousSize.height - 150}px`,
                         marginBottom: '10px'
                     }}>
-                        <h3>채팅방 목록</h3>
+                        <h3>{activeTab.name} 채팅방 목록</h3>
                         <ul style={{ listStyleType: 'none', padding: 0 }}>
                             {filteredRooms.map((room) => (
                                 <li
@@ -226,12 +277,14 @@ const ChatWindow = () => {
                 나의 채팅
             </Button>
             {isOpen && ReactDOM.createPortal(renderChatWindowModal(), document.body)}
-            {openChatRooms.map((roomId) =>
+            {openChatRooms.map(({ chatRoomId, title, imageUrl }) =>
                 ReactDOM.createPortal(
                     <ChatRoom
-                        key={roomId}
-                        chatRoomId={roomId}
-                        closeRoom={() => handleCloseChatRoom(roomId)}
+                        key={chatRoomId}
+                        chatRoomId={chatRoomId}
+                        performanceTitle={title}
+                        performanceImageUrl={imageUrl}
+                        closeRoom={() => handleCloseChatRoom(chatRoomId)}
                     />,
                     document.body
                 )
