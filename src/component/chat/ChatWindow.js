@@ -7,6 +7,8 @@ import Button from '@mui/material/Button';
 import ReactDOM from 'react-dom';
 import ChatRoom from "./ChatRoom";
 import { connectChatListSocket, disconnectChatListSocket } from './ChatSocket';
+import {getMemberInfo} from "../../api/userApi";
+import {useNavigate} from "react-router-dom";
 
 // 탭 이름과 아이콘을 상수로 정의
 const TABS = {
@@ -15,6 +17,7 @@ const TABS = {
 };
 
 const ChatWindow = () => {
+    const navigate = useNavigate(); // useNavigate 훅 사용
     const [isOpen, setIsOpen] = useState(false);
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [previousSize, setPreviousSize] = useState({ width: 500, height: 600, x: 0, y: 100 });
@@ -23,6 +26,23 @@ const ChatWindow = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState(TABS.REQUEST); // 초기 탭 설정
     const [openChatRooms, setOpenChatRooms] = useState([]);
+    const [isRolePadmin, setIsRolePadmin] = useState(false); // 공연관리자 권한 확인
+
+    // 사용자 권한 확인
+    useEffect(() => {
+        const fetchMemberInfo = async () => {
+            try {
+                const memberInfo = await getMemberInfo();
+                if (memberInfo.role === "공연 관리자") {
+                    setIsRolePadmin(true); // 이미 공연관리자 권한이 있으면 상태를 업데이트
+                }
+            } catch (error) {
+                console.error("사용자 정보를 가져오는 중 오류 발생", error);
+            }
+        };
+
+        fetchMemberInfo();
+    }, []);
 
     useEffect(() => {
         setPreviousSize(prevSize => ({
@@ -291,13 +311,22 @@ const ChatWindow = () => {
     return (
         <div>
             <Button
-                sx={{ color: 'black', '&:hover': { backgroundColor: '#E0E0E0', color: '#00008B' } }}
-                onClick={openModal}
+                sx={{color: 'black', '&:hover': {backgroundColor: '#E0E0E0', color: '#00008B'}}}
+                onClick={() => {
+                    if (!isRolePadmin) {
+                        const shouldRedirect = window.confirm("공연 관리자 권한이 없습니다. 권한 신청 페이지로 이동하시겠습니까?");
+                        if (shouldRedirect) {
+                            navigate("/member/role"); // 공연 관리자 권한 신청 페이지로 이동
+                        }
+                        return;
+                    }
+                    openModal(); // 권한이 있을 경우에만 모달 열기
+                }}
             >
                 나의 채팅
             </Button>
             {isOpen && ReactDOM.createPortal(renderChatWindowModal(), document.body)}
-            {openChatRooms.map(({ chatRoomId, title, imageUrl }) =>
+            {openChatRooms.map(({chatRoomId, title, imageUrl}) =>
                 ReactDOM.createPortal(
                     <ChatRoom
                         key={chatRoomId}
