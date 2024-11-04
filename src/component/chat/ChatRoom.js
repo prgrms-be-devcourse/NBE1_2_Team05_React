@@ -43,7 +43,7 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
     useEffect(() => {
         // 메시지가 추가될 때마다 스크롤을 최신 메시지로 이동
         if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+            messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
         }
     }, [messages]);
 
@@ -57,7 +57,6 @@ const ChatRoom = ({ chatRoomId, performanceTitle, performanceImageUrl, closeRoom
 
         // WebSocket을 통해 메시지 전송
         sendChatMessage(messageData);
-        // setMessages([...messages, { senderName: userName, messageContent: newMessage, formattedSentTime: new Date().toLocaleString() }]);
         setNewMessage(''); // 입력창 초기화
     };
 
