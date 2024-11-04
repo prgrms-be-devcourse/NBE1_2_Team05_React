@@ -199,7 +199,7 @@ export const fetchPerformancesAroundPoint = async (pageNum = 1, latitude, longit
 export const enterQueue = async (performanceId) => {
     try {
         const response = await axios.post(
-            `${API_URL}/performances/queue/enter`,
+            `${API_URL}/performances/queue`,
             null, // Request body is empty
             {
                 params: { performanceId }, // Pass performanceId as URL parameter
