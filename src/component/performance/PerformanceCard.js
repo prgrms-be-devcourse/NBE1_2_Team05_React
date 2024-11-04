@@ -79,7 +79,7 @@ const PerformanceCard = ({
                                 {remainingTicket <= 10 && remainingTicket > 0 && (
                                     <div className="status-block warning">마감임박</div>
                                 )}
-                                {remainingTicket === 0 && (
+                                {remainingTicket === 0 && price !== 0 && (
                                     <div className="status-block closed">마감</div>
                                 )}
                             </div>
