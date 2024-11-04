@@ -7,6 +7,8 @@ import Button from '@mui/material/Button';
 import ReactDOM from 'react-dom';
 import ChatRoom from "./ChatRoom";
 import { connectChatListSocket, disconnectChatListSocket } from './ChatSocket';
+import {getMemberInfo} from "../../api/userApi";
+import {useNavigate} from "react-router-dom";
 
 // 탭 이름과 아이콘을 상수로 정의
 const TABS = {
@@ -15,6 +17,7 @@ const TABS = {
 };
 
 const ChatWindow = () => {
+    const navigate = useNavigate(); // useNavigate 훅 사용
     const [isOpen, setIsOpen] = useState(false);
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [previousSize, setPreviousSize] = useState({ width: 500, height: 600, x: 0, y: 100 });
@@ -23,6 +26,23 @@ const ChatWindow = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState(TABS.REQUEST); // 초기 탭 설정
     const [openChatRooms, setOpenChatRooms] = useState([]);
+    const [isRolePadmin, setIsRolePadmin] = useState(false); // 공연관리자 권한 확인
+
+    // 사용자 권한 확인
+    useEffect(() => {
+        const fetchMemberInfo = async () => {
+            try {
+                const memberInfo = await getMemberInfo();
+                if (memberInfo.role === "공연 관리자") {
+                    setIsRolePadmin(true); // 이미 공연관리자 권한이 있으면 상태를 업데이트
+                }
+            } catch (error) {
+                console.error("사용자 정보를 가져오는 중 오류 발생", error);
+            }
+        };
+
+        fetchMemberInfo();
+    }, []);
 
     useEffect(() => {
         setPreviousSize(prevSize => ({
@@ -82,9 +102,15 @@ const ChatWindow = () => {
     }, [searchTerm, chatRooms]);
 
     const handleRoomSelect = (roomId) => {
-        const selectedRoom = chatRooms.find(room => room.chatRoomId === roomId);
-        if (selectedRoom) {
-            setOpenChatRooms([...openChatRooms, selectedRoom]);
+        // 이미 열린 채팅방인지 확인
+        const isRoomAlreadyOpen = openChatRooms.some(room => room.chatRoomId === roomId);
+
+        // 이미 열려 있지 않은 경우에만 채팅방을 추가
+        if (!isRoomAlreadyOpen) {
+            const selectedRoom = chatRooms.find(room => room.chatRoomId === roomId);
+            if (selectedRoom) {
+                setOpenChatRooms([...openChatRooms, selectedRoom]);
+            }
         }
     };
 
@@ -124,7 +150,8 @@ const ChatWindow = () => {
                     zIndex: 1001,
                     position: 'relative',
                     borderRadius: '8px',
-                    pointerEvents: 'auto'
+                    pointerEvents: 'auto',
+                    overflow: 'hidden' // 내부 콘텐츠가 벗어나지 않도록 제한
                 }}
                 onDragStop={(e, d) => setPreviousSize({ ...previousSize, x: d.x, y: d.y })}
                 onResizeStop={(e, direction, ref, delta, position) => {
@@ -220,27 +247,36 @@ const ChatWindow = () => {
                     </Button>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
                     <div style={{
                         flex: 1,
                         overflowY: 'auto',
-                        maxHeight: `${previousSize.height - 150}px`,
-                        marginBottom: '10px'
+                        marginBottom: '20px', // 하단 마진 추가
+                        paddingRight: '10px', // 스크롤바와 콘텐츠 사이의 여백 추가
+                        scrollbarWidth: 'thin' // 스크롤바 두께 조정 (Firefox)
                     }}>
-                        <h3>{activeTab.name} 채팅방 목록</h3>
-                        <ul style={{ listStyleType: 'none', padding: 0 }}>
+                        <div style={{ padding: '0 10px' }}> {/* 제목을 스크롤 영역 안으로 이동 */ }
+                            <h3 style={{ margin: 0 }}>{activeTab.name} 채팅방 목록</h3>
+                        </div>
+                        <ul style={{
+                            listStyleType: 'none',
+                            padding: 0,
+                            margin: 0,
+                            overflowY: 'auto'
+                        }}>
                             {filteredRooms.map((room) => (
                                 <li
                                     key={room.chatRoomId}
                                     onClick={() => handleRoomSelect(room.chatRoomId)}
                                     style={{
                                         display: 'flex',
-                                        alignItems: 'center',
+                                        alignItems: 'flex-start',
                                         justifyContent: 'space-between',
                                         borderBottom: '1px solid #ddd',
                                         padding: '10px 0',
                                         cursor: 'pointer',
                                         transition: 'background-color 0.2s',
+                                        width: '100%' // 리스트 아이템 너비 설정
                                     }}
                                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f0f0f0'}
                                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
@@ -252,9 +288,13 @@ const ChatWindow = () => {
                                             style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover' }}
                                         />
                                     </div>
-                                    <div style={{ flexGrow: 1 }}>
-                                        <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>{room.title}</div>
-                                        <div style={{ color: '#666' }}>{room.lastMessage}</div>
+                                    <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                        <div style={{ fontWeight: 'bold', marginBottom: '5px', alignSelf: 'flex-start' }}>
+                                            {room.title}
+                                        </div>
+                                        <div style={{ color: '#666', alignSelf: 'flex-start' }}>
+                                            {room.lastMessage}
+                                        </div>
                                     </div>
                                     <div style={{ flex: '0 0 80px', textAlign: 'right', marginRight: '30px' }}>
                                         <div>{room.timeAgo}</div>
@@ -271,13 +311,22 @@ const ChatWindow = () => {
     return (
         <div>
             <Button
-                sx={{ color: 'black', '&:hover': { backgroundColor: '#E0E0E0', color: '#00008B' } }}
-                onClick={openModal}
+                sx={{color: 'black', '&:hover': {backgroundColor: '#E0E0E0', color: '#00008B'}}}
+                onClick={() => {
+                    if (!isRolePadmin) {
+                        const shouldRedirect = window.confirm("공연 관리자 권한이 없습니다. 권한 신청 페이지로 이동하시겠습니까?");
+                        if (shouldRedirect) {
+                            navigate("/member/role"); // 공연 관리자 권한 신청 페이지로 이동
+                        }
+                        return;
+                    }
+                    openModal(); // 권한이 있을 경우에만 모달 열기
+                }}
             >
                 나의 채팅
             </Button>
             {isOpen && ReactDOM.createPortal(renderChatWindowModal(), document.body)}
-            {openChatRooms.map(({ chatRoomId, title, imageUrl }) =>
+            {openChatRooms.map(({chatRoomId, title, imageUrl}) =>
                 ReactDOM.createPortal(
                     <ChatRoom
                         key={chatRoomId}

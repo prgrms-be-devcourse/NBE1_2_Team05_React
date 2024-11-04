@@ -1,11 +1,9 @@
 // 공연 상세 정보 페이지
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchDetailData, confirmPerformance } from '../../api/performanceApi'; // API 요청 함수
-import CommentList from '../../component/comment/CommentList'
-// PerformanceDetailPage.js
-import { enterQueue } from '../../api/performanceApi'; // enterQueue 함수 import
-
+import { fetchDetailData, confirmPerformance, enterQueue} from '../../api/performanceApi'; // API 요청 함수
+import {createChatRoom} from '../../api/chatApi'
+import CommentList from '../../component/comment/CommentList';
 import {
     Container,
     Typography,
@@ -23,8 +21,10 @@ import {
     DialogContent
 } from '@mui/material';
 import KakaoMap from "../../component/performance/KakaoMap";
+import { getFirstComeCoupon } from "../../api/couponApi";
+import ChatRoom from '../../component/chat/ChatRoom'; // ChatRoom 컴포넌트 import
+import ReactDOM from 'react-dom';
 import {getMemberInfo} from "../../api/userApi";
-import {getFirstComeCoupon} from "../../api/couponApi";
 
 export default function PerformanceDetailPage() {
     const { performanceId } = useParams(); // URL에서 performanceId 가져오기
@@ -37,18 +37,34 @@ export default function PerformanceDetailPage() {
     const [openDialog, setOpenDialog] = useState(false); // Dialog 상태 관리
     const [selectedImage, setSelectedImage] = useState('');
     const [couponExpiration, setCouponExpiration] = useState(false);
-
+    const [openChat, setOpenChat] = useState(false); // 채팅방 열림 상태 관리
+    const [chatRoomId, setChatRoomId] = useState(null); // 채팅방 ID 저장
+    const [isRolePadmin, setIsRolePadmin] = useState(false); // 공연관리자 권한 확인
 
     const [formData, setFormData] = useState({
         status: ''
     });
 
+    // 사용자 권한 확인
+    useEffect(() => {
+        const fetchMemberInfo = async () => {
+            try {
+                const memberInfo = await getMemberInfo();
+                if (memberInfo.role === "공연 관리자") {
+                    setIsRolePadmin(true); // 이미 공연관리자 권한이 있으면 상태를 업데이트
+                }
+            } catch (error) {
+                console.error("사용자 정보를 가져오는 중 오류 발생", error);
+            }
+        };
+
+        fetchMemberInfo();
+    }, []);
+
     useEffect(() => {
         const getPerformanceDetails = async () => {
             try {
-                console.log(performanceId);
                 const data = await fetchDetailData(performanceId); // ID로 데이터 요청
-                console.log(data)
                 setPerformanceData(data);
 
                 if (data.firstComeCoupons && data.firstComeCoupons.every(coupon => coupon.expireTime !== null)) {
@@ -92,14 +108,12 @@ export default function PerformanceDetailPage() {
     // 공연 확정짓기 핸들러
     const handleConfirmPerformance = async () => {
         try {
-            // formData 업데이트
             const updatedData = {
                 status: 'CONFIRMED', // 상태를 CONFIRMED로 변경
             };
 
             await confirmPerformance(performanceId, updatedData); // API 호출
-            // 공연 상세 정보 다시 조회
-            const data = await fetchDetailData(performanceId);
+            const data = await fetchDetailData(performanceId); // 공연 상세 정보 다시 조회
             setPerformanceData(data); // 상태 업데이트
         } catch (err) {
             setError(err.message); // 에러 처리
@@ -108,13 +122,9 @@ export default function PerformanceDetailPage() {
     };
 
     const handleTicketPurchase = async () => {
-        console.log("performanceId " + performanceId)
         try {
             const response = await enterQueue(performanceId); // performanceId를 전달
-            console.log(response); // 응답 확인
-
             if (response && response.isSuccess) {
-                console.log(`대기열에 추가되었습니다. 현재 대기 순위: ${response.result.rank}`);
                 navigate(`/payment`, {
                     state: {
                         performanceId: performanceData.performanceId,
@@ -133,12 +143,10 @@ export default function PerformanceDetailPage() {
         }
     };
 
-
-    //선착순 쿠폰 발급 핸들러
+    // 선착순 쿠폰 발급 핸들러
     const handleFirstComeCoupon = async () => {
         try {
             const data = await getFirstComeCoupon(performanceId);
-
             if (data.code === "COUPON400") {
                 alert(`${data.message}`);
                 setCouponExpiration(true);
@@ -164,13 +172,46 @@ export default function PerformanceDetailPage() {
         }
     };
 
+    // 채팅방 열기 핸들러
+    const handleJoinChat = async () => {
+        if (!isRolePadmin) {
+            // 공연 관리자 권한이 없는 경우 경고 메시지 표시 및 페이지 이동 확인
+            const shouldRedirect = window.confirm("공연 관리자 권한이 없습니다. 권한 신청 페이지로 이동하시겠습니까?");
+            if (shouldRedirect) {
+                navigate("/member/role"); // 공연 관리자 권한 신청 페이지로 이동
+            }
+            return;
+        }
+
+        try {
+            const response = await createChatRoom(performanceId);
+            if (response && response.isSuccess && response.result) {
+                const { chatRoomId } = response.result;
+                console.log(chatRoomId);
+                if (chatRoomId) {
+                    console.log("공연 채팅 활성화1");
+                    setChatRoomId(chatRoomId);
+                    setOpenChat(true);
+                }
+            } else {
+                console.log("응답에 문제가 있습니다:", response);
+                alert("채팅방을 열 수 없습니다.");
+            }
+            console.log("공연 채팅 활성화2");
+        } catch (error) {
+            console.error("채팅방 생성 오류:", error);
+            alert("채팅방을 열 수 없습니다.");
+        }
+    };
+
+
     const open = Boolean(anchorEl);
     const id = open ? 'attendees-popover' : undefined;
 
     return (
         <Container maxWidth="900px">
             <Paper elevation={3} sx={{ p: 3, my: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="h5" gutterBottom>
                         {performanceData.title}
                     </Typography>
@@ -202,12 +243,12 @@ export default function PerformanceDetailPage() {
                                     mb: 2,
                                     cursor: 'pointer',
                                     position: 'relative',
-                                    backgroundImage: 'url("/youtube_icon.png")', // 유튜브 아이콘 URL
-                                    backgroundSize: 'contain', // 아이콘 크기 조정
-                                    backgroundPosition: 'center', // 아이콘 중앙 정렬
-                                    backgroundRepeat: 'no-repeat', // 아이콘 반복 방지
-                                    boxShadow: 'none', // 그림자 제거
-                                    bgcolor: 'transparent' // 배경 색상 투명
+                                    backgroundImage: 'url("/youtube_icon.png")',
+                                    backgroundSize: 'contain',
+                                    backgroundPosition: 'center',
+                                    backgroundRepeat: 'no-repeat',
+                                    boxShadow: 'none',
+                                    bgcolor: 'transparent'
                                 }}
                             >
                             </Paper>
@@ -217,25 +258,26 @@ export default function PerformanceDetailPage() {
                         <img
                             src={performanceData?.imageUrl || "/logo192.png"}
                             alt="Performance Image"
-                            style={{ width: '100%', height: '100%', cursor: 'pointer' }} // 커서 포인터 추가
-                            onClick={handleImageClick} // 클릭 핸들러 추가
+                            style={{ width: '100%', height: '100%', cursor: 'pointer' }}
+                            onClick={handleImageClick}
                         />
                     </Grid>
                 </Grid>
 
-                {/* Dialog 컴포넌트 추가 */}
                 <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
                     <DialogContent sx={{ display: 'flex', justifyContent: 'center' }}>
                         <img
                             src={selectedImage}
                             alt="Enlarged"
-                            style={{ width: '100%', height: 'auto' }} // 이미지 크기 조정
+                            style={{ width: '100%', height: 'auto' }}
                         />
                     </DialogContent>
                 </Dialog>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                    <Typography sx={{marginRight:'100px', marginBottom:'20px', color: 'grey.500'}}>{performanceData.remainingTickets} / {performanceData.maxAudience} </Typography>
+                    <Typography sx={{ marginRight: '100px', marginBottom: '20px', color: 'grey.500' }}>
+                        {performanceData.remainingTickets} / {performanceData.maxAudience}
+                    </Typography>
                     <Box>
                         <Popover
                             id={id}
@@ -255,8 +297,9 @@ export default function PerformanceDetailPage() {
                                 ))}
                             </List>
                         </Popover>
-                        {/* 공연 티켓 구매 클릭 시 티켓 결재 창으로 링크하는 플로우 구현해야함 */}
-                        <Button variant="outlined" onClick={handleTicketPurchase}>공연 티켓 구매</Button>
+                        {/* 공연 티켓 구매 및 채팅방 열기 버튼 */}
+                        <Button variant="outlined" onClick={handleTicketPurchase} sx={{ mr: 2 }}>공연 티켓 구매</Button>
+                        <Button variant="outlined" color="secondary" onClick={handleJoinChat}>공연 관리자와 채팅하기</Button>
                     </Box>
                 </Box>
 
@@ -267,19 +310,19 @@ export default function PerformanceDetailPage() {
                         <Typography variant="subtitle1">공연 일시</Typography>
                         <Typography>{performanceData.startDateTime} ~ {performanceData.endDateTime}</Typography>
                     </Grid>
-                    <Grid item xs={15} sm={5}>
+                    <Grid item xs={12} sm={5}>
                         <Typography variant="subtitle1">장소</Typography>
                         <Typography>{performanceData.address}</Typography>
                         <KakaoMap address={performanceData.address} /> {/* KakaoMap 컴포넌트 사용 */}
-
                     </Grid>
-                    <Grid item xs={5} sm={2}>
+                    <Grid item xs={12} sm={2}>
                         <Typography variant="subtitle1">가격</Typography>
                         <Typography>{performanceData.price}원</Typography>
                     </Grid>
                 </Grid>
 
                 <Divider sx={{ my: 3 }} />
+
                 {performanceData.firstComeCoupons && (
                     <Grid container alignItems="center">
                         <Grid item xs={12} sm={4}>
@@ -298,6 +341,7 @@ export default function PerformanceDetailPage() {
                         </Grid>
                     </Grid>
                 )}
+
                 <Divider sx={{ my: 3 }} />
 
                 <Grid item xs={12} sm={4}>
@@ -306,6 +350,18 @@ export default function PerformanceDetailPage() {
                 {/* 댓글 컴포넌트 추가 */}
                 <CommentList performanceId={performanceId} />
             </Paper>
+
+            {/* 채팅방 열기 */}
+            {openChat && chatRoomId && ReactDOM.createPortal(
+                <ChatRoom
+                    key={chatRoomId}
+                    chatRoomId={chatRoomId}
+                    performanceTitle={performanceData.title}
+                    performanceImageUrl={performanceData.imageUrl || "/logo192.png"}
+                    closeRoom={() => setOpenChat(false)}
+                />,
+                document.body
+            )}
         </Container>
     );
 }
