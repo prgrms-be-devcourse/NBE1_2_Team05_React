@@ -38,9 +38,11 @@ export const getMessages = async (chatRoomId) => {
 };
 
 // 사용자가 참여한 채팅방 목록 조회 API
-export const getChatRooms = async () => {
+export const getChatRooms = async (isManager = false) => {
     try {
-        const response = await axios.get(`${CHAT_API_URL}/room/my`);
+        // isManager가 true일 경우 쿼리 파라미터를 추가
+        const url = isManager ? `${CHAT_API_URL}/room/my?isManager=true` : `${CHAT_API_URL}/room/my`;
+        const response = await axios.get(url);
         return response.data.result;  // 결과는 응답에서 result 필드에 있을 것으로 가정
     } catch (error) {
         console.error('Error fetching chat rooms', error);
