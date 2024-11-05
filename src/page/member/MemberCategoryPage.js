@@ -112,10 +112,10 @@ export default function MemberCategoryPage() {
             setTimeout(() => {
                 // 이전 페이지가 로그인 페이지인지 확인하거나 명시적으로 홈으로 리다이렉트
                 const previousPage = location.state?.from;
-                if (previousPage && previousPage === '/signin') {
+                if (previousPage && (previousPage === '/signin' || previousPage === '/signup')) {
                     navigate('/'); // 로그인 페이지가 이전 페이지면 홈으로 이동
                 } else {
-                    navigate(-1);  // 그렇지 않으면 이전 페이지로 이동
+                    navigate('/');  // 그렇지 않으면 이전 페이지로 이동
                 }
             }, 1000);
         } catch (error) {
