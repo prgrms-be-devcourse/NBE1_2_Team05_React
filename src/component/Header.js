@@ -32,7 +32,7 @@ const PAGE_LINKS = {
     MANAGER_APPLY: { name: '공연관리자 신청', link: '/member/role' },
 };
 
-const pages = [PAGE_LINKS.CATEGORY_1, PAGE_LINKS.CATEGORY_2, PAGE_LINKS.CATEGORY_3];
+const pages = [PAGE_LINKS.CATEGORY_1, PAGE_LINKS.CATEGORY_2];
 const settings = [PAGE_LINKS.MY_PAGE, PAGE_LINKS.MANAGER_APPLY, PAGE_LINKS.LOGOUT];
 
 function reducer(state, action) {
