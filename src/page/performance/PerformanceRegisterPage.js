@@ -86,7 +86,7 @@ const PerformanceRegisterPage = () => {
         longitude: '',
         description: '',
         maxAudience: '',
-        organizer: '',
+        price: '',
         categories: []
     });
     const [categories, setCategories] = useState([]);
@@ -132,7 +132,7 @@ const PerformanceRegisterPage = () => {
             longitude: formData.longitude,
             description: formData.description,
             maxAudience: formData.maxAudience,
-            organizer: formData.organizer,
+            price: formData.price,
             categories: selectedCategories,
         })], { type: 'application/json' }));
 
@@ -320,9 +320,9 @@ const PerformanceRegisterPage = () => {
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <TextFieldWithLabel
-                                        label="주최자"
-                                        value={formData.organizer}
-                                        onChange={(e) => setFormData({ ...formData, organizer: e.target.value })}
+                                        label=" 티켓 금액"
+                                        value={formData.price}
+                                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                                     />
                                 </Grid>
                             </Grid>

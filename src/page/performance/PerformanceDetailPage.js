@@ -269,7 +269,7 @@ export default function PerformanceDetailPage() {
                     </Grid>
                     <Grid item xs={15} sm={5}>
                         <Typography variant="subtitle1">장소</Typography>
-                        <Typography>{performanceData.address}</Typography>
+                        <Typography>{performanceData.address} {performanceData.location}</Typography>
                         <KakaoMap address={performanceData.address} /> {/* KakaoMap 컴포넌트 사용 */}
 
                     </Grid>

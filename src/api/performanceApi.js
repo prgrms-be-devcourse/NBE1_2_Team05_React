@@ -64,6 +64,7 @@ export const fetchDetailData = async (performanceId = null) => {
             description: item.description,
             maxAudience: item.maxAudience,
             address: item.address,
+            location: item.location,
             imageUrl: item.imageUrl || defaultImageUrl,
             price: item.price,
             remainingTickets: item.remainingTickets,
