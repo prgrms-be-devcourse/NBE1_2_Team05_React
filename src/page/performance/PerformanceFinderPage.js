@@ -48,6 +48,11 @@ const PerformanceFinderPage = () => {
         handleSubmit();
     }, [page]); // 좌표도 의존성에 추가
 
+    const handleNearbyPerformancesClick = () => {
+        setPage(1); // 페이지를 1로 설정
+        handleSubmit(); // 데이터 요청
+    };
+
     const handleSubmit = async () => {
         setLoadingFavorites(true);
         // 좌표 전송 처리 (예: API 요청)
@@ -93,7 +98,7 @@ const PerformanceFinderPage = () => {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: '1300px', alignItems: 'center' }}>
                 <h1 style={{ flex: 1, textAlign: 'center' }}>공연 정보 및 지도</h1>
-                <Button variant="contained" color="primary" onClick={handleSubmit}>
+                <Button variant="contained" color="primary" onClick={handleNearbyPerformancesClick}>
                         근처 공연 보기
                 </Button>
             </div>

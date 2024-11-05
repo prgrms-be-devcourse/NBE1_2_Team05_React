@@ -109,6 +109,7 @@ export const getMemberInfo = async () => {
 
         // 응답이 성공적일 경우 사용자 정보 반환
         if (response.data.isSuccess) {
+            console.log(response.data);
             return response.data.result;  // 서버에서 반환하는 사용자 정보
         }
     } catch (error) {

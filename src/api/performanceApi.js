@@ -54,6 +54,7 @@ export const fetchData = async (pageNum = 1, category = null, search = '') => {
 export const fetchDetailData = async (performanceId = null) => {
     try {
         const response = await axios.get(`${API_URL}/performances/${performanceId}`);
+        console.log(response);
         const item = response.data.result;
         return {
             memberName: item.memberName,
@@ -70,7 +71,7 @@ export const fetchDetailData = async (performanceId = null) => {
             remainingTickets: item.remainingTickets,
             startDate: item.startDate,
             status: item.status,
-            isUpdatable: item.isUpdatable,
+            isUpdatable: item.updatable,
             createdAt: item.createdAt,
             updatedAt: item.updatedAt,
             categories: item.categories,
@@ -180,6 +181,7 @@ export const fetchPerformancesAroundPoint = async (pageNum = 1, latitude, longit
                 size: performancesPerPage
             },
         });
+        console.log(response);
 
         // imageUrl이 null일 경우 기본 이미지 설정
         const performances = response.data.result.performanceList.map(performance => ({
