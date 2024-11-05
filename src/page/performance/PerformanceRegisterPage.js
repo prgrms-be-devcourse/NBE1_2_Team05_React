@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // useNavigate import 추가
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import {
     Typography,
     Container,
@@ -275,17 +276,19 @@ const PerformanceRegisterPage = () => {
                             />
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6}>
-                                    <DatePickerField
+                                    <DateTimePicker
                                         label="시작 날짜"
                                         value={formData.dateStartTime}
                                         onChange={(newValue) => setFormData({ ...formData, dateStartTime: newValue })}
+                                        renderInput={(params) => <TextField {...params} />}
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <DatePickerField
+                                    <DateTimePicker
                                         label="종료 날짜"
                                         value={formData.dateEndTime}
                                         onChange={(newValue) => setFormData({ ...formData, dateEndTime: newValue })}
+                                        renderInput={(params) => <TextField {...params} />}
                                     />
                                 </Grid>
                             </Grid>
